@@ -9,8 +9,8 @@ import (
 )
 
 type ByteDanceInstance struct {
-	rtc    *rtc_v20231101.Rtc
-	config ByteDanceConfig
+	Rtc    *rtc_v20231101.Rtc
+	Config ByteDanceConfig
 }
 
 type ByteDanceConfig struct {
@@ -78,12 +78,12 @@ func (m *InstanceManager) GetInstance(key string) (*ByteDanceInstance, error) {
 
 	// 创建新实例
 	instance := &ByteDanceInstance{
-		rtc:    rtc_v20231101.NewInstance(),
-		config: appConfig,
+		Rtc:    rtc_v20231101.NewInstance(),
+		Config: appConfig,
 	}
 
 	// 设置凭证
-	instance.rtc.SetCredential(base.Credentials{
+	instance.Rtc.SetCredential(base.Credentials{
 		AccessKeyID:     appConfig.AK,
 		SecretAccessKey: appConfig.SK,
 		Region:          appConfig.Region,
