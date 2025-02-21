@@ -28,12 +28,13 @@ type AppIDMapConfig struct {
 
 // InstanceManager 管理多个字节跳动实例
 type InstanceManager struct {
-	instances sync.Map                  // key -> *ByteDanceInstance
-	appIDMap  map[string]AppIDMapConfig `mapstructure:"appIDMap"`
-	ak        string
-	sk        string
-	region    string
-	mu        sync.RWMutex
+	instances       sync.Map                  // key -> *ByteDanceInstance
+	appIDMap        map[string]AppIDMapConfig `mapstructure:"appIDMap"`
+	reverseAppIDMap map[string]string         // appID -> key
+	ak              string
+	sk              string
+	region          string
+	mu              sync.RWMutex
 }
 
 var (
@@ -45,14 +46,27 @@ var (
 func GetInstanceManager(appIDMap map[string]AppIDMapConfig, ak, sk, region string) *InstanceManager {
 	once.Do(func() {
 		defaultManager = &InstanceManager{
-			instances: sync.Map{},
-			appIDMap:  appIDMap,
-			ak:        ak,
-			sk:        sk,
-			region:    region,
+			instances:       sync.Map{},
+			appIDMap:        appIDMap,
+			ak:              ak,
+			sk:              sk,
+			region:          region,
+			reverseAppIDMap: make(map[string]string),
 		}
+		for key, value := range appIDMap {
+			defaultManager.reverseAppIDMap[value.AppID] = key
+		}
+
 	})
 	return defaultManager
+}
+
+func (m *InstanceManager) GetAppIDInstance(appID string) (*ByteDanceInstance, error) {
+	key, ok := m.reverseAppIDMap[appID]
+	if ok {
+		return m.GetInstance(key)
+	}
+	return nil, errors.New("not found")
 }
 
 // GetInstance 根据 key 获取或创建实例
