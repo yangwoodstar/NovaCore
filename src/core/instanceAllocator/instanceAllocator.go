@@ -1,0 +1,129 @@
+package instanceAllocator
+
+import (
+	"errors"
+	"fmt"
+	"github.com/volcengine/volc-sdk-golang/base"
+	rtc_v20231101 "github.com/volcengine/volc-sdk-golang/service/rtc/v20231101"
+	"sync"
+)
+
+type ByteDanceInstance struct {
+	rtc    *rtc_v20231101.Rtc
+	config ByteDanceConfig
+}
+
+type ByteDanceConfig struct {
+	AK     string
+	SK     string
+	AppID  string
+	AppKey string
+	Region string
+}
+
+type AppIDMapConfig struct {
+	AppID  string `mapstructure:"appID"`
+	AppKey string `mapstructure:"appKey"`
+}
+
+// InstanceManager 管理多个字节跳动实例
+type InstanceManager struct {
+	instances sync.Map                  // key -> *ByteDanceInstance
+	appIDMap  map[string]AppIDMapConfig `mapstructure:"appIDMap"`
+	ak        string
+	sk        string
+	region    string
+	mu        sync.RWMutex
+}
+
+var (
+	defaultManager *InstanceManager
+	once           sync.Once
+)
+
+// GetInstanceManager 获取实例管理器的单例
+func GetInstanceManager(appIDMap map[string]AppIDMapConfig, ak, sk, region string) *InstanceManager {
+	once.Do(func() {
+		defaultManager = &InstanceManager{
+			instances: sync.Map{},
+			appIDMap:  appIDMap,
+			ak:        ak,
+			sk:        sk,
+			region:    region,
+		}
+	})
+	return defaultManager
+}
+
+// GetInstance 根据 key 获取或创建实例
+func (m *InstanceManager) GetInstance(key string) (*ByteDanceInstance, error) {
+	// 先尝试获取现有实例
+	if instance, ok := m.instances.Load(key); ok {
+		return instance.(*ByteDanceInstance), nil
+	}
+
+	// 获取该 key 对应的配置
+	appConfig, err := m.getConfigForKey(key)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get config for key %s: %w", key, err)
+	}
+	// 创建新实例
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	// 双重检查，避免并发创建
+	if instance, ok := m.instances.Load(key); ok {
+		return instance.(*ByteDanceInstance), nil
+	}
+
+	// 创建新实例
+	instance := &ByteDanceInstance{
+		rtc:    rtc_v20231101.NewInstance(),
+		config: appConfig,
+	}
+
+	// 设置凭证
+	instance.rtc.SetCredential(base.Credentials{
+		AccessKeyID:     appConfig.AK,
+		SecretAccessKey: appConfig.SK,
+		Region:          appConfig.Region,
+	})
+
+	// 存储实例
+	m.instances.Store(key, instance)
+
+	return instance, nil
+}
+
+// getConfigForKey 根据 key 获取配置
+func (m *InstanceManager) getConfigForKey(appID string) (ByteDanceConfig, error) {
+	// 从配置中获取对应的凭证
+	// 这里需要根据你的实际配置管理方式来实现
+	appConfig, ok := m.appIDMap[appID]
+	if ok == false {
+		return ByteDanceConfig{}, errors.New("not exist")
+	}
+
+	return ByteDanceConfig{
+		AK:     m.ak,
+		SK:     m.sk,
+		AppID:  appConfig.AppID,
+		AppKey: appConfig.AppKey,
+		Region: m.region, // 可以根据需要从配置中获取
+	}, nil
+}
+
+// RemoveInstance 移除指定的实例
+func (m *InstanceManager) RemoveInstance(key string) {
+	m.instances.Delete(key)
+}
+
+// ListInstances 列出所有实例的 key
+func (m *InstanceManager) ListInstances() []string {
+	var keys []string
+	m.instances.Range(func(key, value interface{}) bool {
+		keys = append(keys, key.(string))
+		return true
+	})
+	return keys
+}
