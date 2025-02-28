@@ -4,6 +4,7 @@ go 1.23.1
 
 require (
 	github.com/IBM/sarama v1.45.0
+	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spaolacci/murmur3 v1.1.0
 	github.com/volcengine/volc-sdk-golang v1.0.196
 	go.uber.org/zap v1.27.0
