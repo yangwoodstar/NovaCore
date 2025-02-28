@@ -57,5 +57,5 @@ type RPCBroadcastModel struct {
 	Reply         string          `json:"reply"`
 	Index         int             `json:"index"`
 	BigData       BigDataModel    `json:"bigData"`
-	From          FromUser        `json:"from,omitempty"`
+	From          *FromUser       `json:"from,omitempty"`
 }
