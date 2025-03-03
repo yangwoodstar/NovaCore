@@ -1,4 +1,4 @@
-package model
+package modelStruct
 
 type Task struct {
 	RoomID  string

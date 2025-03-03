@@ -1,4 +1,4 @@
-package model
+package modelStruct
 
 import "encoding/json"
 

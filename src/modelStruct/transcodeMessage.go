@@ -1,4 +1,4 @@
-package model
+package modelStruct
 
 type TranscodeInfo struct {
 	ParentRoomID     string   `json:"parentRoomID"`
