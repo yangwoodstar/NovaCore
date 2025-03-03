@@ -1,6 +1,7 @@
 package constString
 
 const (
-	LargeClassPriority = 6
+	NoPriority         = 0
 	SmallClassPriority = 5
+	LargeClassPriority = 6
 )
