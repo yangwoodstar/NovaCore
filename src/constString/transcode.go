@@ -5,3 +5,7 @@ const (
 	SmallClassPriority = 5
 	LargeClassPriority = 6
 )
+
+const (
+	ConsistentHashBindingKey = "1"
+)
