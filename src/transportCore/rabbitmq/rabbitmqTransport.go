@@ -20,6 +20,7 @@ type ConfigRabbitMQInfo struct {
 	QueueDurable       bool
 	QueueAutoDelete    bool
 	Priority           int
+	AutoAck            bool
 }
 
 type TransportRabbitMQ struct {
@@ -179,7 +180,7 @@ func (rt *TransportRabbitMQ) bindQueue(configInfo *ConfigRabbitMQInfo) error {
 }
 
 func (rt *TransportRabbitMQ) consumeMessages(configInfo *ConfigRabbitMQInfo) error {
-	deliveries, err := rt.channel.Consume(configInfo.Queue, configInfo.Queue, false, false, false, false, nil)
+	deliveries, err := rt.channel.Consume(configInfo.Queue, configInfo.Queue, configInfo.AutoAck, false, false, false, nil)
 	if err != nil {
 		return fmt.Errorf("Consume error: %w", err)
 	}
