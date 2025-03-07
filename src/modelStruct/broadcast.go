@@ -59,4 +59,5 @@ type RPCBroadcastModel struct {
 	BigData       BigDataModel    `json:"bigData"`
 	From          *FromUser       `json:"from,omitempty"`
 	RecordTime    int64           `json:"recordTime,omitempty"`
+	PlaybackTime  int64           `json:"playbackTime,omitempty"`
 }
