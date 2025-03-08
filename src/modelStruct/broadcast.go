@@ -59,5 +59,5 @@ type RPCBroadcastModel struct {
 	BigData       BigDataModel    `json:"bigData"`
 	From          *FromUser       `json:"from,omitempty"`
 	RecordTime    int64           `json:"recordTime,omitempty"`
-	Offset        int64           `json:"offset,omitempty"`
+	Offset        int64           `json:"offset"`
 }
