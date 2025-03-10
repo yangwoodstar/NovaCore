@@ -62,13 +62,13 @@ func NewTransportRabbitMQ(amqpURI string, logger *zap.Logger) (*TransportRabbitM
 func (rt *TransportRabbitMQ) Connect() error {
 	rt.logger.Info("Connect", zap.String("amqpURI", rt.amqpURI))
 	var err error
-	dialConfig := amqp.Config{
-		Properties: amqp.Table{"connection_timeout": int32(3 * time.Second / time.Millisecond)},
-		Heartbeat:  10 * time.Second,
-	}
-
+	/*	dialConfig := amqp.Config{
+			Properties: amqp.Table{"connection_timeout": int32(3 * time.Second / time.Millisecond)},
+			Heartbeat:  10 * time.Second,
+		}
+	*/
 	for {
-		if rt.conn, err = amqp.DialConfig(rt.amqpURI, dialConfig); err == nil {
+		if rt.conn, err = amqp.Dial(rt.amqpURI); err == nil {
 			rt.logger.Info("Connected to RabbitMQ")
 			break
 		}
