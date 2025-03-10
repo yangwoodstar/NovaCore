@@ -55,6 +55,7 @@ func (u *UnifiedTransport) AddReceiver(topic string, t Transport) {
 		for {
 			msg, readErr := t.Read()
 			if readErr != nil {
+
 				continue
 			}
 			u.msgChan <- msg

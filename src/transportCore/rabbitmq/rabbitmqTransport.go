@@ -60,6 +60,7 @@ func NewTransportRabbitMQ(amqpURI string, logger *zap.Logger) (*TransportRabbitM
 }
 
 func (rt *TransportRabbitMQ) Connect() error {
+	rt.logger.Info("Connect", zap.String("amqpURI", rt.amqpURI))
 	var err error
 	dialConfig := amqp.Config{
 		Properties: amqp.Table{"connection_timeout": int32(3 * time.Second / time.Millisecond)},
@@ -77,6 +78,7 @@ func (rt *TransportRabbitMQ) Connect() error {
 
 	rt.channel, err = rt.conn.Channel()
 	if err != nil {
+		rt.logger.Error("Channel error", zap.Error(err), zap.String("amqpURI", rt.amqpURI))
 		return fmt.Errorf("Channel: %w", err)
 	}
 
@@ -84,6 +86,19 @@ func (rt *TransportRabbitMQ) Connect() error {
 	go rt.monitorReconnect()
 
 	return nil
+}
+
+func (rt *TransportRabbitMQ) SetPrefetchCount(prefetchCount int) {
+	rt.logger.Info("SetPrefetchCount", zap.Int("prefetchCount", prefetchCount))
+	err := rt.channel.Qos(
+		prefetchCount, // prefetch count
+		0,             // prefetch size (0表示不限制)
+		false,         // global设置 (false表示仅当前消费者生效)
+	)
+
+	if err != nil {
+		rt.logger.Error("Qos error", zap.Error(err))
+	}
 }
 
 func (rt *TransportRabbitMQ) monitorConnection() {
@@ -153,7 +168,7 @@ func (rt *TransportRabbitMQ) AddReceiver(configInfo *ConfigRabbitMQInfo) error {
 
 func (rt *TransportRabbitMQ) declareExchange(configInfo *ConfigRabbitMQInfo) error {
 	if err := rt.channel.ExchangeDeclare(configInfo.Exchange, configInfo.Kind, configInfo.ExchangeDurable, configInfo.ExchangeAutoDelete, false, false, nil); err != nil {
-		rt.logger.Error("ExchangeDeclare error", zap.Error(err))
+		rt.logger.Error("ExchangeDeclare error", zap.Error(err), zap.Any("configInfo", configInfo))
 		return err
 	}
 	return nil
@@ -168,12 +183,14 @@ func (rt *TransportRabbitMQ) bindQueue(configInfo *ConfigRabbitMQInfo) error {
 	}
 
 	if _, err := rt.channel.QueueDeclare(configInfo.Queue, configInfo.QueueDurable, configInfo.QueueAutoDelete, false, false, args); err != nil {
+		rt.logger.Error("Queue Declare error", zap.Error(err), zap.Any("configInfo", configInfo))
 		return fmt.Errorf("error in declaring the queue: %w", err)
 	}
 
 	// 使用整数作为绑定键
 
 	if err := rt.channel.QueueBind(configInfo.Queue, configInfo.BindingKey, configInfo.Exchange, false, nil); err != nil {
+		rt.logger.Error("Queue Bind error", zap.Error(err), zap.Any("configInfo", configInfo))
 		return fmt.Errorf("Queue Bind error: %w", err)
 	}
 	return nil
@@ -182,6 +199,7 @@ func (rt *TransportRabbitMQ) bindQueue(configInfo *ConfigRabbitMQInfo) error {
 func (rt *TransportRabbitMQ) consumeMessages(configInfo *ConfigRabbitMQInfo) error {
 	deliveries, err := rt.channel.Consume(configInfo.Queue, configInfo.Queue, configInfo.AutoAck, false, false, false, nil)
 	if err != nil {
+		rt.logger.Error("Consume error", zap.Error(err), zap.Any("configInfo", configInfo))
 		return fmt.Errorf("Consume error: %w", err)
 	}
 
@@ -190,12 +208,13 @@ func (rt *TransportRabbitMQ) consumeMessages(configInfo *ConfigRabbitMQInfo) err
 	go func(msg <-chan amqp.Delivery) {
 		for m := range msg {
 			if rt.reConnect && string(m.Body) == "" {
-				rt.logger.Error("connection closed")
+				rt.logger.Error("connection closed", zap.Any("msg", m), zap.Any("configInfo", configInfo))
 				return
 			}
 			rt.logger.Info("Read message", zap.String("msg", string(m.Body)))
 			rt.msgChan <- m
 		}
+		rt.logger.Info("Close msg channel", zap.Any("configInfo", configInfo))
 	}(deliveries)
 
 	return nil
@@ -232,7 +251,7 @@ func (rt *TransportRabbitMQ) Write(msg []byte, exchange, routerKey string, prior
 	if exists {
 		err := rt.channel.Publish(exchange, routerKey, false, false, p)
 		if err != nil {
-			rt.logger.Error("Error in Publishing", zap.Error(err))
+			rt.logger.Error("Error in Publishing", zap.Error(err), zap.Any("msg", msg), zap.String("exchange", exchange))
 			return fmt.Errorf("Error in Publishing: %w", err)
 		}
 	} else {
@@ -256,6 +275,7 @@ func (rt *TransportRabbitMQ) publishMessage(exchange, routerKey string, p amqp.P
 
 // Close 关闭 TransportRabbitMQ
 func (rt *TransportRabbitMQ) Close() {
+	rt.logger.Info("Close ******************************")
 	if err := rt.conn.Close(); err != nil {
 		rt.logger.Error("Close error", zap.Error(err))
 	}
