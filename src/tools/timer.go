@@ -2,6 +2,7 @@ package tools
 
 import (
 	"crypto/rand"
+	"fmt"
 	"github.com/google/uuid"
 	"io"
 	"os"
@@ -29,9 +30,6 @@ func ExistDirectory(path string) error {
 		if err != nil {
 			return err
 		}
-	} else {
-		// 目录已经存在
-		//fmt.Println("Directory already exists:", path)
 	}
 	return nil
 }
@@ -43,13 +41,13 @@ func AppendToFile(filePath string, data []byte) error {
 		return err
 	}
 	defer func(f *os.File) {
-		err := f.Close()
+		err = f.Close()
 		if err != nil {
 			return
 		}
 	}(f)
 
-	if _, err := f.Write(data); err != nil {
+	if _, err = f.Write(data); err != nil {
 		return err
 	}
 	return nil
@@ -64,7 +62,7 @@ func CopyFile(src string, dstDir string) error {
 		return err
 	}
 	defer func(sourceFile *os.File) {
-		err := sourceFile.Close()
+		err = sourceFile.Close()
 		if err != nil {
 			return
 		}
@@ -80,7 +78,12 @@ func CopyFile(src string, dstDir string) error {
 	if err != nil {
 		return err
 	}
-	defer destinationFile.Close()
+	defer func(destinationFile *os.File) {
+		err = destinationFile.Close()
+		if err != nil {
+			return
+		}
+	}(destinationFile)
 
 	// 拷贝文件内容
 	_, err = io.Copy(destinationFile, sourceFile)
@@ -97,7 +100,6 @@ func CopyFile(src string, dstDir string) error {
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -128,4 +130,17 @@ func GetRandomString(length int) (string, error) {
 	}
 
 	return string(byteArray), nil
+}
+
+// CheckAndCreateDir 检查指定的目录是否存在，如果不存在则创建它。
+func CheckAndCreateDir(dirPath string) error {
+	// 检查文件夹是否存在
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		// 文件夹不存在，创建它
+		err = os.Mkdir(dirPath, 0755) // 0755 是文件夹的权限
+		if err != nil {
+			return fmt.Errorf("failed to create directory: %w", err)
+		}
+	}
+	return nil
 }
