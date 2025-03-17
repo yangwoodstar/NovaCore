@@ -21,6 +21,7 @@ type ConfigRabbitMQInfo struct {
 	QueueAutoDelete    bool
 	Priority           int
 	AutoAck            bool
+	PrefetchCount      int
 }
 
 type TransportRabbitMQ struct {
@@ -148,33 +149,49 @@ func (rt *TransportRabbitMQ) AddSender(configInfo *ConfigRabbitMQInfo) error {
 	rt.logger.Info("AddSender", zap.String("id", configInfo.ID), zap.Any("configInfo", configInfo))
 	rt.sendersInfo[configInfo.Exchange] = configInfo
 	rt.senders[configInfo.Exchange] = configInfo.Exchange
-	return rt.declareExchange(configInfo)
+	return rt.declareExchange(configInfo, rt.channel)
 }
 
 func (rt *TransportRabbitMQ) AddReceiver(configInfo *ConfigRabbitMQInfo) error {
+	var err error
+	var channel = rt.channel
+	if configInfo.PrefetchCount > 0 {
+		channel, err = rt.conn.Channel()
+		if err != nil {
+			rt.logger.Error("Channel error", zap.Error(err), zap.String("amqpURI", rt.amqpURI))
+			return fmt.Errorf("Channel: %w", err)
+		}
+
+		err = channel.Qos(
+			configInfo.PrefetchCount, // prefetch count
+			0,                        // prefetch size (0表示不限制)
+			false,                    // global设置 (false表示仅当前消费者生效)
+		)
+
+	}
 	rt.logger.Info("AddReceiver", zap.String("id", configInfo.ID), zap.Any("configInfo", configInfo))
 	rt.receiversInfo[configInfo.Exchange] = configInfo
 	rt.senders[configInfo.Exchange] = configInfo.Exchange
-	if err := rt.declareExchange(configInfo); err != nil {
+	if err := rt.declareExchange(configInfo, channel); err != nil {
 		return err
 	}
 
-	if err := rt.bindQueue(configInfo); err != nil {
+	if err := rt.bindQueue(configInfo, channel); err != nil {
 		return err
 	}
 
-	return rt.consumeMessages(configInfo)
+	return rt.consumeMessages(configInfo, channel)
 }
 
-func (rt *TransportRabbitMQ) declareExchange(configInfo *ConfigRabbitMQInfo) error {
-	if err := rt.channel.ExchangeDeclare(configInfo.Exchange, configInfo.Kind, configInfo.ExchangeDurable, configInfo.ExchangeAutoDelete, false, false, nil); err != nil {
+func (rt *TransportRabbitMQ) declareExchange(configInfo *ConfigRabbitMQInfo, channel *amqp.Channel) error {
+	if err := channel.ExchangeDeclare(configInfo.Exchange, configInfo.Kind, configInfo.ExchangeDurable, configInfo.ExchangeAutoDelete, false, false, nil); err != nil {
 		rt.logger.Error("ExchangeDeclare error", zap.Error(err), zap.Any("configInfo", configInfo))
 		return err
 	}
 	return nil
 }
 
-func (rt *TransportRabbitMQ) bindQueue(configInfo *ConfigRabbitMQInfo) error {
+func (rt *TransportRabbitMQ) bindQueue(configInfo *ConfigRabbitMQInfo, channel *amqp.Channel) error {
 	var args amqp.Table = nil
 	if configInfo.Priority > 0 {
 		args = amqp.Table{
@@ -182,22 +199,22 @@ func (rt *TransportRabbitMQ) bindQueue(configInfo *ConfigRabbitMQInfo) error {
 		}
 	}
 
-	if _, err := rt.channel.QueueDeclare(configInfo.Queue, configInfo.QueueDurable, configInfo.QueueAutoDelete, false, false, args); err != nil {
+	if _, err := channel.QueueDeclare(configInfo.Queue, configInfo.QueueDurable, configInfo.QueueAutoDelete, false, false, args); err != nil {
 		rt.logger.Error("Queue Declare error", zap.Error(err), zap.Any("configInfo", configInfo))
 		return fmt.Errorf("error in declaring the queue: %w", err)
 	}
 
 	// 使用整数作为绑定键
 
-	if err := rt.channel.QueueBind(configInfo.Queue, configInfo.BindingKey, configInfo.Exchange, false, nil); err != nil {
+	if err := channel.QueueBind(configInfo.Queue, configInfo.BindingKey, configInfo.Exchange, false, nil); err != nil {
 		rt.logger.Error("Queue Bind error", zap.Error(err), zap.Any("configInfo", configInfo))
 		return fmt.Errorf("Queue Bind error: %w", err)
 	}
 	return nil
 }
 
-func (rt *TransportRabbitMQ) consumeMessages(configInfo *ConfigRabbitMQInfo) error {
-	deliveries, err := rt.channel.Consume(configInfo.Queue, configInfo.Queue, configInfo.AutoAck, false, false, false, nil)
+func (rt *TransportRabbitMQ) consumeMessages(configInfo *ConfigRabbitMQInfo, channel *amqp.Channel) error {
+	deliveries, err := channel.Consume(configInfo.Queue, configInfo.Queue, configInfo.AutoAck, false, false, false, nil)
 	if err != nil {
 		rt.logger.Error("Consume error", zap.Error(err), zap.Any("configInfo", configInfo))
 		return fmt.Errorf("Consume error: %w", err)
