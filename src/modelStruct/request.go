@@ -8,7 +8,7 @@ type RequestModel struct {
 	Reply   string          `json:"reply"`
 	Forward string          `json:"forward"`
 	Params  json.RawMessage `json:"params"` // 使用指针以便处理 JsonNode
-	ID      uint64          `json:"id"`
+	ID      int             `json:"id"`
 	Token   string          `json:"token"`
 	To      string          `json:"to"`
 	BaseRequest
