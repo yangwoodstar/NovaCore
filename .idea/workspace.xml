@@ -5,9 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e37a4c2c-1c6b-4691-880b-8d327039da9f" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/src/modelStruct/ffmpeg.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tools/executor.go" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/tools/ffmpegTool.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/constString/error.go" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/modelStruct/anyMessage.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
