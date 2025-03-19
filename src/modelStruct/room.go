@@ -49,3 +49,8 @@ type CustomDataUser struct {
 	ScreenAudioOn bool   `json:"screenAudioOn"`
 	OnStage       bool   `json:"onStage"`
 }
+
+type ActiveUserParams struct {
+	ID         string `json:"id"`
+	UserRoomID string `json:"userRoomID"`
+}
