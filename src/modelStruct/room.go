@@ -23,6 +23,11 @@ type UserModel struct {
 	Status             int    `json:"status"`
 	HasAudioPermission bool   `json:"hasAudioPermission"`
 	HasVideoPermission bool   `json:"hasVideoPermission"`
+	AppID              string `json:"appID"`
+	RoomID             string `json:"roomID"`
+	Cursor             string `json:"cursor"`
+	IP                 string `json:"ip"`
+	DeviceInfo         string `json:"deviceInfo"`
 }
 
 type CustomDataParams struct {
