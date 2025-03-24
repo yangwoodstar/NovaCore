@@ -2,7 +2,6 @@ package tools
 
 import (
 	"crypto/rand"
-	"fmt"
 	"github.com/google/uuid"
 	"io"
 	"os"
@@ -19,19 +18,6 @@ func GenerateUUID() string {
 	uuidInstance := uuid.New()
 	// 将 UUID 转换为字符串
 	return uuidInstance.String()
-}
-
-func ExistDirectory(path string) error {
-	// 检查目录是否存在
-	// 检查目录是否存在
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		// 目录不存在，创建多级目录
-		err = os.MkdirAll(path, 0755) // 0755 是目录的权限
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 // AppendToFile appendToFile 将数据追加到文件末尾
@@ -130,17 +116,4 @@ func GetRandomString(length int) (string, error) {
 	}
 
 	return string(byteArray), nil
-}
-
-// CheckAndCreateDir 检查指定的目录是否存在，如果不存在则创建它。
-func CheckAndCreateDir(dirPath string) error {
-	// 检查文件夹是否存在
-	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
-		// 文件夹不存在，创建它
-		err = os.Mkdir(dirPath, 0755) // 0755 是文件夹的权限
-		if err != nil {
-			return fmt.Errorf("failed to create directory: %w", err)
-		}
-	}
-	return nil
 }

@@ -2,7 +2,10 @@ package cloudStorage
 
 import (
 	"context"
+	"errors"
 	"github.com/volcengine/ve-tos-golang-sdk/v2/tos"
+	"github.com/yangwoodstar/NovaCore/src/modelStruct"
+	"github.com/yangwoodstar/NovaCore/src/tools"
 	"go.uber.org/zap"
 )
 
@@ -21,6 +24,43 @@ type TosClient struct {
 	TosContext context.Context
 	TosInfo    *TosInfo
 	Logger     *zap.Logger
+}
+
+func NewInternalTosClient(cms *modelStruct.Credentials, private bool) (*TosClient, error) {
+	timeMilli, err := tools.SwitchToTime(cms.ExpiredTime)
+	if err != nil {
+		return nil, err
+	}
+
+	if timeMilli < tools.GetTimeStamp()+600000 {
+		return nil, errors.New("expired")
+	}
+
+	tosClient := &TosClient{}
+	var ctx = context.Background()
+	if private == false {
+		tosClient.TosInfo.Region = cms.Region
+	} else {
+		tosClient.TosInfo.Region = cms.InnerEndpoint
+	}
+
+	tosClient.TosInfo.Bucket = cms.Bucket
+	tosClient.TosInfo.AccessKey = cms.AccessKeyId
+	tosClient.TosInfo.SecretKey = cms.SecretAccessKey
+	tosClient.TosInfo.ExpiredTime = timeMilli
+	tosClient.TosContext = ctx
+	tosClient.TosInfo.StsToken = cms.SessionToken
+
+	credential := tos.NewStaticCredentials(tosClient.TosInfo.AccessKey, tosClient.TosInfo.SecretKey)
+	// 初始化 Client 时使用 STS Token
+	credential.WithSecurityToken(tosClient.TosInfo.StsToken)
+	client, err := tos.NewClientV2(tosClient.TosInfo.EndPoint, tos.WithRegion(tosClient.TosInfo.Bucket), tos.WithCredentials(credential), tos.WithMaxRetryCount(3))
+	if err != nil {
+		return nil, err
+	}
+
+	tosClient.Client = client
+	return tosClient, nil
 }
 
 func NewTosClient(tosInfo *TosInfo, logger *zap.Logger) (*TosClient, error) {

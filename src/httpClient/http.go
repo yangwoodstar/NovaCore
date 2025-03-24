@@ -41,7 +41,7 @@ func ProcessPost(url, data, sn, appCode, accessKey string) ([]byte, error) {
 		return []byte(""), err
 	}
 	defer func(Body io.ReadCloser) {
-		err := Body.Close()
+		err = Body.Close()
 		if err != nil {
 		}
 	}(resp.Body)
@@ -102,7 +102,7 @@ func ProcessGet(urlStr, sn, appCode, accessKey string, params map[string]string)
 		return []byte(""), err
 	}
 	defer func(Body io.ReadCloser) {
-		err := Body.Close()
+		err = Body.Close()
 		if err != nil {
 		}
 	}(resp.Body) // 确保在函数退出时关闭响应体
