@@ -1,6 +1,8 @@
 package tools
 
-import "os"
+import (
+	"os"
+)
 
 func FileExists(path string) (bool, error) {
 	// 获取文件信息
@@ -18,4 +20,12 @@ func FileExists(path string) (bool, error) {
 
 	// 其他错误（如权限问题）
 	return false, err
+}
+
+func RemoveDir(dirPath string) error {
+	err := os.RemoveAll(dirPath)
+	if err != nil {
+		return err
+	}
+	return nil
 }
