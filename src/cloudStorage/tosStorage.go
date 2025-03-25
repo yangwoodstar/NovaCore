@@ -35,8 +35,10 @@ func NewInternalTosClient(cms *modelStruct.Credentials, private bool) (*TosClien
 	if timeMilli < tools.GetTimeStamp()+600000 {
 		return nil, errors.New("expired")
 	}
-
-	tosClient := &TosClient{}
+	tosInfo := &TosInfo{}
+	tosClient := &TosClient{
+		TosInfo: tosInfo,
+	}
 	var ctx = context.Background()
 	if private == false {
 		tosClient.TosInfo.EndPoint = cms.Endpoint
