@@ -25,4 +25,5 @@ type ScreenshotConfig struct {
 	Bucket            string      `json:"Bucket,omitempty"`            // 存储截图的桶名称（仅 TOS/S3 平台生效）
 	VeImageXServiceID string      `json:"VeImageXServiceId,omitempty"` // VeImageX 的服务 ID（仅 VeImageX 平台生效）
 	Data              []ImageData `json:"Data"`                        // 截图数据集合
+	Domain            string      `json:"Domain"`                      // 存储截图的域名（仅 TOS/S3 平台生效）
 }
