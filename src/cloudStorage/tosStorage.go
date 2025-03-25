@@ -31,13 +31,13 @@ func NewInternalTosClient(cms *modelStruct.Credentials, private bool, logger *za
 	if err != nil {
 		return nil, err
 	}
-
 	if timeMilli < tools.GetTimeStamp()+600000 {
 		return nil, errors.New("expired")
 	}
 	tosInfo := &TosInfo{}
 	tosClient := &TosClient{
 		TosInfo: tosInfo,
+		Logger:  logger,
 	}
 	var ctx = context.Background()
 	if private == false {
