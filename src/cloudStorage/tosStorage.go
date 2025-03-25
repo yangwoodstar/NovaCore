@@ -26,7 +26,7 @@ type TosClient struct {
 	Logger     *zap.Logger
 }
 
-func NewInternalTosClient(cms *modelStruct.Credentials, private bool) (*TosClient, error) {
+func NewInternalTosClient(cms *modelStruct.Credentials, private bool, logger *zap.Logger) (*TosClient, error) {
 	timeMilli, err := tools.SwitchToTime(cms.ExpiredTime)
 	if err != nil {
 		return nil, err
