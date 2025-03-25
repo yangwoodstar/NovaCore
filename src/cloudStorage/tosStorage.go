@@ -39,11 +39,12 @@ func NewInternalTosClient(cms *modelStruct.Credentials, private bool) (*TosClien
 	tosClient := &TosClient{}
 	var ctx = context.Background()
 	if private == false {
-		tosClient.TosInfo.Region = cms.Region
+		tosClient.TosInfo.EndPoint = cms.Endpoint
 	} else {
-		tosClient.TosInfo.Region = cms.InnerEndpoint
+		tosClient.TosInfo.EndPoint = cms.InnerEndpoint
 	}
 
+	tosClient.TosInfo.Region = cms.Region
 	tosClient.TosInfo.Bucket = cms.Bucket
 	tosClient.TosInfo.AccessKey = cms.AccessKeyId
 	tosClient.TosInfo.SecretKey = cms.SecretAccessKey
