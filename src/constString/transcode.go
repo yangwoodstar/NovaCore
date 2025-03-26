@@ -16,6 +16,7 @@ const (
 )
 
 const (
-	TranscodeNormalType   = 0
-	TranscodeFakeLiveType = 1
+	TranscodeNormalType    = 0
+	TranscodeAIEnglishType = 1
+	TranscodeFakeLiveType  = 2
 )
