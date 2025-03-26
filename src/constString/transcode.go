@@ -14,3 +14,8 @@ const (
 	RabbitMQConsistentHashBindingKey = "1"
 	RabbitMQDefaultBindingKey        = ""
 )
+
+const (
+	TranscodeNormalType   = 0
+	TranscodeFakeLiveType = 1
+)
