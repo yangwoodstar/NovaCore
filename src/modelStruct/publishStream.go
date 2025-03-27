@@ -12,3 +12,8 @@ type PublishStream struct {
 	Width     int    `json:"width"`
 	Height    int    `json:"height"`
 }
+
+type PublishStreamResponse struct {
+	SessionID string `json:"sessionID"`
+	Rtmp      string `json:"rtmp"`
+}
