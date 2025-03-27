@@ -17,3 +17,7 @@ type PublishStreamResponse struct {
 	SessionID string `json:"sessionID"`
 	Rtmp      string `json:"rtmp"`
 }
+
+type Hidden struct {
+	Hidden bool `json:"hidden"`
+}
