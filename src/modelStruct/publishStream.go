@@ -6,7 +6,7 @@ type PublishStreamParams struct {
 
 type PublishStream struct {
 	StreamID  string `json:"streamID"`
-	MediaType string `json:"mediaType"`
+	MediaType int    `json:"mediaType"`
 	Video     bool   `json:"video"`
 	Audio     bool   `json:"audio"`
 	Width     int    `json:"width"`
