@@ -2,8 +2,11 @@ package tools
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/yangwoodstar/NovaCore/src/constString"
 	"github.com/yangwoodstar/NovaCore/src/modelStruct"
+	"strconv"
+	"strings"
 )
 
 func GetResolution(filePath string) (*modelStruct.Resolution, string, string, error) {
@@ -46,4 +49,37 @@ func GetResolution(filePath string) (*modelStruct.Resolution, string, string, er
 		}
 	}
 	return &resolution, out, errOut, nil
+}
+
+func GetVideoDurationArgs(filePath string) []string {
+	var args []string
+	args = append(args, constString.V)
+	args = append(args, constString.Error)
+	args = append(args, constString.ShowEntries)
+	args = append(args, constString.Duration)
+	args = append(args, constString.OF)
+	args = append(args, constString.Default)
+	args = append(args, filePath)
+	return args
+}
+
+// GetVideoDuration 获取视频时长
+func GetVideoDuration(filePath string) (int64, string, error) {
+	args := GetVideoDurationArgs(filePath)
+	exec := NewCommandExecutor()
+	err := exec.Run(constString.FFProbe, args...)
+	if err != nil {
+		return 0, "", err
+	}
+
+	out := exec.Output()
+	errOut := exec.StderrOutput()
+	// 转换为浮点数
+	durationStr := strings.TrimSpace(out)
+	duration, err := strconv.ParseFloat(durationStr, 64)
+	if err != nil {
+		fmt.Println("Error parsing duration:", err)
+		return 0, "", err
+	}
+	return int64(duration), errOut, nil
 }
