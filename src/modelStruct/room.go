@@ -59,3 +59,7 @@ type ActiveUserParams struct {
 	ID         string `json:"id"`
 	UserRoomID string `json:"userRoomID"`
 }
+
+type DisableRaiseHandParams struct {
+	Disable bool `json:"disable"`
+}
