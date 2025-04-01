@@ -16,5 +16,5 @@ type Stream struct {
 }
 
 type MediaFormat struct {
-	Streams []Stream `json:"streams"`
+	Streams []VideoStream `json:"streams"`
 }
