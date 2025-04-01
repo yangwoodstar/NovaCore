@@ -56,7 +56,7 @@ const (
 	OutputFormat        = "-of"
 	JsonFormat          = "json"
 	V                   = "-v"
-	A                   = "-a"
+	A                   = "a"
 	SelectStreams       = "-select_streams"
 	VideoStream         = "v:0"
 	VideoStreamPrefix   = "0:v"
