@@ -83,3 +83,39 @@ func GetVideoDuration(filePath string) (int64, string, error) {
 	}
 	return int64(duration), errOut, nil
 }
+
+func HasAudio(filePath string) (bool, string, string, error) {
+	// 构造FFprobe参数
+	var args []string
+	args = append(args, constString.V)
+	args = append(args, constString.Error)
+	args = append(args, constString.SelectStreams)
+	args = append(args, constString.A)
+	args = append(args, constString.ShowEntries)
+	args = append(args, constString.ShowCodec)
+	args = append(args, constString.OF)
+	args = append(args, constString.JsonFormat)
+	args = append(args, filePath)
+
+	// 创建命令执行器
+	exec := NewCommandExecutor()
+	err := exec.Run(constString.FFProbe, args...)
+	if err != nil {
+		return false, "", "", err
+	}
+
+	// 获取输出
+	out := exec.Output()
+	errOut := exec.StderrOutput()
+
+	// 解析JSON响应
+
+	var result modelStruct.MediaFormat
+	if err := json.Unmarshal([]byte(out), &result); err != nil {
+		return false, out, errOut, err
+	}
+
+	// 判断是否有音频流
+	hasAudio := len(result.Streams) > 0
+	return hasAudio, out, errOut, nil
+}

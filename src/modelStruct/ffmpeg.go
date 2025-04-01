@@ -11,6 +11,10 @@ type VideoStream struct {
 	Height    int    `json:"height"`
 }
 
+type Stream struct {
+	CodecType string `json:"codec_type"`
+}
+
 type MediaFormat struct {
-	Streams []VideoStream `json:"streams"`
+	Streams []Stream `json:"streams"`
 }
