@@ -6,9 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="e37a4c2c-1c6b-4691-880b-8d327039da9f" name="更改" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/constString/ffmpegParams.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/constString/ffmpegParams.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/modelStruct/ffmpeg.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/modelStruct/ffmpeg.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/tools/ffmpegTool.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/tools/ffmpegTool.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/transportCore/kafka/kafkaTransport.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/transportCore/kafka/kafkaTransport.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

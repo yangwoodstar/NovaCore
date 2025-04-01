@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/IBM/sarama"
+	"github.com/yangwoodstar/NovaCore/src/transportCore"
 	"go.uber.org/zap"
 	"sync"
 	"time"
@@ -72,6 +73,11 @@ func (kp *KafkaProducer) handleAsyncResults() {
 			return
 		}
 	}
+}
+
+func (kp *KafkaProducer) Read() (transportCore.UnificationMessage, error) {
+	kafkaMessage := KafkaMessage{message: "", topic: "msg.Exchange"}
+	return &kafkaMessage, nil
 }
 
 func (kp *KafkaProducer) Write(message []byte, topic, routerKey string, priority int) error {
