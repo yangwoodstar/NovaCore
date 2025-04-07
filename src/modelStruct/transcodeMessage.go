@@ -21,4 +21,5 @@ type TranscodeInfo struct {
 	Priority         int      `json:"priority"`
 	OssPath          OssPath  `json:"ossPath"`
 	TaskID           string   `json:"taskID"`
+	Name             string   `json:"name"`
 }
