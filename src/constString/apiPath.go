@@ -1,8 +1,8 @@
 package constString
 
 const (
-	LiveBackEndRoomInfo           = "/api/room/find"
-	LiveBackEndSeniorJunior       = "/api/room/sc-list"
+	LiveBackendRoomInfo           = "/api/room/find"
+	LiveBackendSeniorJunior       = "/api/room/sc-list"
 	LiveBackendPlaybackID         = "/api/play-back/find"
 	LiveBackendCreatePlaybackPath = "/api/play-back/create"
 	LiveBackendUpdatePlaybackPath = "/api/video-source/update"
