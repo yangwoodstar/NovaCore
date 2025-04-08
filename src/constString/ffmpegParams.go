@@ -78,6 +78,10 @@ const (
 	ShowEntries         = "-show_entries"
 	AdaptationSet       = "-adaptation_sets"
 	AdaptationSetParams = "id=0,streams=v id=1,streams=a"
+
+	AddAudioParams = "anullsrc=channel_layout=stereo:sample_rate=44100"
+	AudioDuration  = "-shortest"
+	AddAudioStream = "1:a"
 )
 
 // probe
