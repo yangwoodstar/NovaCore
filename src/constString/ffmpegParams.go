@@ -60,7 +60,7 @@ const (
 	SelectStreams       = "-select_streams"
 	VideoStream         = "v:0"
 	VideoStreamPrefix   = "0:v"
-	AudioStreamPrefix   = "0:a"
+	AudioStreamPrefix   = "0:a?"
 	Dash                = "dash"
 	DashSegment         = "-dash_segment_type"
 	DashSegDuration     = "-seg_duration"
