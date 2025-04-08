@@ -92,7 +92,7 @@ const (
 	ColorSpaceValue     = "bt709"
 	ShowDuration        = "format=duration"
 
-	AddAudioParams = "anullsrc=channel_layout=stereo:sample_rate=44100"
+	AddAudioParams = "-f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100"
 	AudioDuration  = "-shortest"
 	AddAudioStream = "1:a"
 )
