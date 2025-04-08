@@ -56,3 +56,25 @@ func ExistDirectory(path string) error {
 	}
 	return nil
 }
+
+func GetFileSize(filePath string) (int64, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return 0, err
+	}
+	// 确保在函数结束时关闭文件
+	defer func(file *os.File) {
+		err = file.Close()
+		if err != nil {
+			fmt.Println("Error closing file:", err)
+		}
+	}(file)
+
+	// 获取文件信息
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return 0, err
+	}
+	// 获取文件大小
+	return fileInfo.Size(), nil
+}
