@@ -20,7 +20,6 @@ func ProcessPost(url, data, sn, appCode, accessKey string) ([]byte, error) {
 	if err != nil {
 		return []byte(""), err
 	}
-
 	// 设置请求头
 	req.Header.Set("Content-type", "application/json")
 	req.Header.Set("charset", "utf-8")

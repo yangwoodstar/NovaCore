@@ -30,7 +30,7 @@ func SendWaningMessage(url, message, mobile string) (string, error) {
 	}
 
 	// 这里调用了httpApi包中的函数
-	response, err := httpClient.ProcessPost(url, "", "", "", string(jsonData))
+	response, err := httpClient.ProcessPost(url, string(jsonData), "", "", "")
 	if err != nil {
 		return "", err
 	}

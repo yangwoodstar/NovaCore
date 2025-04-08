@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/yangwoodstar/NovaCore/src/api"
 	"github.com/yangwoodstar/NovaCore/src/core/instanceAllocator"
 	"github.com/yangwoodstar/NovaCore/src/transportCore"
 	"github.com/yangwoodstar/NovaCore/src/transportCore/kafka"
@@ -204,6 +206,36 @@ func TestAppID() {
 	fmt.Printf("Instances after removal: %v\n", keys)
 }
 
+type DingTalkMessage struct {
+	MsgType string `json:"msgtype"`
+	Message string `json:"markdown"`
+}
+
+func TestDingTalk() {
+	//url := "https://oapi.dingtalk.com/robot/send?access_token=your_access_token"
+	//url := ""
+	url := ""
+
+	mobile := "13155154441"
+	dingTalkMessage := DingTalkMessage{
+		MsgType: "live",
+		Message: "this is a test message",
+	}
+
+	message, err := json.Marshal(dingTalkMessage)
+	if err != nil {
+		log.Fatalf("Failed to marshal message: %v", err)
+	}
+
+	//message = []byte("### 测试消息\nHello, this is a test message.") // 直接传递Markdown内容
+	message = []byte("1234567890") // 直接传递Markdown内容
+	response, err := api.SendWaningMessage(url, string(message), mobile)
+	if err != nil {
+		log.Fatalf("Failed to send message: %v", err)
+	}
+	fmt.Printf("Response: %s\n", response)
+}
 func main() {
-	Test()
+	//Test()
+	TestDingTalk()
 }
