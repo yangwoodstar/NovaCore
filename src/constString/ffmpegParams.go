@@ -91,10 +91,10 @@ const (
 	SetColorSpace       = "-colorspace"
 	ColorSpaceValue     = "bt709"
 	ShowDuration        = "format=duration"
-
-	AddAudioParams = "-f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100"
-	AudioDuration  = "-shortest"
-	AddAudioStream = "1:a"
+	AudioLAVfi          = "lavfi"
+	AddAudioParams      = "anullsrc=channel_layout=stereo:sample_rate=44100"
+	AudioDuration       = "-shortest"
+	AddAudioStream      = "1:a"
 )
 
 // probe
