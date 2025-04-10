@@ -42,6 +42,10 @@ func (p *CustomPartitioner) Partition(msg *sarama.ProducerMessage, numPartitions
 	if err != nil || len(key) == 0 {
 		return 0, err // 键编码失败，返回错误
 	}
+
+	if msg.Partition == 0 {
+		return 0, nil // 如果分区为0，则返回0
+	}
 	// 使用一致性哈希选择分区
 	p.logger.Debug("key", zap.String("key", string(key)), zap.Int32("partition", msg.Partition))
 	consumer := p.ch.Get(string(key))

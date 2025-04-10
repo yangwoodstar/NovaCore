@@ -135,13 +135,10 @@ func (kp *KafkaProducer) Write(message []byte, topic, routerKey string, priority
 
 	kp.logger.Info("Publish message", zap.String("topic", topic), zap.String("parentRoomID", routerKey), zap.Int("priority", priority))
 	msg := &sarama.ProducerMessage{
-		Topic: topic,
-		Key:   sarama.StringEncoder(routerKey),
-		Value: sarama.ByteEncoder(message),
-	}
-
-	if priority == 0 {
-		msg.Partition = 0
+		Topic:     topic,
+		Key:       sarama.StringEncoder(routerKey),
+		Value:     sarama.ByteEncoder(message),
+		Partition: int32(priority),
 	}
 
 	kp.wg.Add(1)
