@@ -140,6 +140,10 @@ func (kp *KafkaProducer) Write(message []byte, topic, routerKey string, priority
 		Value: sarama.ByteEncoder(message),
 	}
 
+	if priority == 0 {
+		msg.Partition = 0
+	}
+
 	kp.wg.Add(1)
 	go func() {
 		defer kp.wg.Done()
