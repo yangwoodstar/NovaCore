@@ -43,7 +43,7 @@ func (p *CustomPartitioner) Partition(msg *sarama.ProducerMessage, numPartitions
 		return 0, err // 键编码失败，返回错误
 	}
 	// 使用一致性哈希选择分区
-	p.logger.Debug("key", zap.String("key", string(key)))
+	p.logger.Debug("key", zap.String("key", string(key)), zap.Int32("partition", msg.Partition))
 	consumer := p.ch.Get(string(key))
 	if consumer == "" {
 		return 0, fmt.Errorf("no consumer found for key: %s", string(key)) // 无法找到消费者，返回错误

@@ -133,7 +133,7 @@ func (kp *KafkaProducer) Write(message []byte, topic, routerKey string, priority
 	}
 	kp.mu.Unlock()
 
-	kp.logger.Info("Publish message", zap.String("topic", topic), zap.String("parentRoomID", routerKey))
+	kp.logger.Info("Publish message", zap.String("topic", topic), zap.String("parentRoomID", routerKey), zap.Int("priority", priority))
 	msg := &sarama.ProducerMessage{
 		Topic: topic,
 		Key:   sarama.StringEncoder(routerKey),
