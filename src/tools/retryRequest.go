@@ -26,7 +26,7 @@ type SendConfig struct {
 	Mobile string
 	RoomID string
 	Method string
-	logger *zap.Logger
+	Logger *zap.Logger
 }
 
 // 通用重试执行器
@@ -108,22 +108,22 @@ func SendRequest(connectionRequest ConnectionRequest, request *modelStruct.Reque
 	errCallback := func(errMsg error, index int) error {
 		joinRoomData, errMarshal := json.Marshal(request)
 		if errMarshal != nil {
-			sendConfig.logger.Error("Failed to marshal join room data", zap.Error(errMarshal))
+			sendConfig.Logger.Error("Failed to marshal join room data", zap.Error(errMarshal))
 		}
 		if joinRoomData != nil {
 			message, err := api.SendWaningMessage(sendConfig.Url, fmt.Sprintf("send to liveRoom error: %v %v %v  %s \n retry time: %v \n", string(joinRoomData), sendConfig.RoomID, errMsg, sendConfig.Method, index), sendConfig.Mobile)
 			if err != nil {
-				sendConfig.logger.Error("Failed to send message", zap.Error(err))
+				sendConfig.Logger.Error("Failed to send message", zap.Error(err))
 			} else {
-				sendConfig.logger.Info("Message sent successfully", zap.String("response", message))
+				sendConfig.Logger.Info("Message sent successfully", zap.String("response", message))
 			}
 		} else {
 			// 如果 joinRoomData 为空，则使用 request 的字符串表示
 			message, err := api.SendWaningMessage(sendConfig.Url, fmt.Sprintf("send to liveRoom error: %v %v %v  %s \n retry time: %v \n", request, sendConfig.RoomID, errMsg, sendConfig.Method, index), sendConfig.Mobile)
 			if err != nil {
-				sendConfig.logger.Error("Failed to send message", zap.Error(err))
+				sendConfig.Logger.Error("Failed to send message", zap.Error(err))
 			} else {
-				sendConfig.logger.Info("Message sent successfully", zap.String("response", message))
+				sendConfig.Logger.Info("Message sent successfully", zap.String("response", message))
 			}
 		}
 		return nil
@@ -148,8 +148,8 @@ func SendRequest(connectionRequest ConnectionRequest, request *modelStruct.Reque
 
 	err := Retry(req)
 	if err != nil {
-		sendConfig.logger.Error("Retry failed", zap.Error(err))
+		sendConfig.Logger.Error("Retry failed", zap.Error(err))
 	} else {
-		sendConfig.logger.Info("Request succeeded", zap.Any("response", response))
+		sendConfig.Logger.Info("Request succeeded", zap.Any("response", response))
 	}
 }
