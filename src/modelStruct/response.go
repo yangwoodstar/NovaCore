@@ -10,4 +10,5 @@ type ResponseModel struct {
 	Result        json.RawMessage `json:"result"` // 使用 interface{} 以支持不同类型的结果
 	Sender        string          `json:"sender"`
 	Timestamp     int64           `json:"timestamp"` // 使用 int64 以存储时间戳
+	Error         interface{}     `json:"error"`
 }
