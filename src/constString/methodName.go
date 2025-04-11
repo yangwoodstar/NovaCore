@@ -30,3 +30,14 @@ const (
 	LiveStartRecord     = "liveRecordStart"
 	LiveEndRecord       = "liveRecordEnd"
 )
+
+const (
+	JoinRoom            = "joinRoom"
+	LeaveRoom           = "leaveRoom"
+	DisableRaiseHand    = "disableRaiseHand"
+	EndClass            = "endClass"
+	HiddenTeacherWindow = "hiddenTeacherWindow"
+	PublishStream       = "publishStream"
+	StartClass          = "startClass"
+	ToggleClass         = "toggleClass"
+)
