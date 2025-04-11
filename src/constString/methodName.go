@@ -40,4 +40,7 @@ const (
 	PublishStream       = "publishStream"
 	StartClass          = "startClass"
 	ToggleClass         = "toggleClass"
+	AddActiveUser       = "addActiveUser"
+	RemoveActiveUser    = "removeActiveUser"
+	CustomData          = "customData"
 )
