@@ -1,5 +1,9 @@
 package modelStruct
 
+import (
+	"time"
+)
+
 type EmptyParams struct {
 }
 
@@ -62,4 +66,32 @@ type ActiveUserParams struct {
 
 type DisableRaiseHandParams struct {
 	Disable bool `json:"disable"`
+}
+
+type Room struct {
+	ID                int       `json:"id"`
+	AppID             string    `json:"app_id"`
+	ParentRoomID      string    `json:"parent_room_id"`
+	RoomID            string    `json:"room_id"`
+	Name              string    `json:"name"`
+	ClassType         int8      `json:"class_type"`
+	LiveType          int8      `json:"live_type"`
+	LiveStatus        int8      `json:"live_status"`
+	TeacherID         string    `json:"teacher_id"`
+	StartTime         int64     `json:"start_time"`
+	EndTime           int64     `json:"end_time"`
+	PlayBackID        int64     `json:"play_back_id"`
+	ConfigID          uint      `json:"config_id"`
+	OssPath           []byte    `json:"oss_path"`
+	BjyInfo           []byte    `json:"bjy_info"`
+	CourseChapterType int8      `json:"course_chapter_type"`
+	PlayBackVideoID   string    `json:"play_back_video_id"`
+	MockChat          bool      `json:"mock_chat"`
+	CreateAt          time.Time `json:"create_at"`
+	UpdateAt          time.Time `json:"update_at"`
+	IsSelfVideo       bool      `json:"is_self_video"`
+	DisasterRecovery  bool      `json:"disaster_recovery"`
+	TeacherName       string    `json:"teacher_name"`
+	VideoID           string    `json:"video_id"`
+	VideoSourceType   int8      `json:"video_source_type"`
 }
