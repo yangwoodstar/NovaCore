@@ -2,8 +2,8 @@ package modelStruct
 
 type RoomListRequest struct {
 	AppID     string `json:"appId"`
-	StartTime string `json:"startTime"`
-	EndTime   string `json:"endTime"`
+	StartTime int64  `json:"startTime"`
+	EndTime   int64  `json:"endTime"`
 }
 
 /*
