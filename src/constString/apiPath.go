@@ -8,6 +8,8 @@ const (
 	LiveBackendUpdatePlaybackPath = "/api/video-source/update"
 	LiveReportTranscodePath       = "/api/report/playbackConverter"
 	LiveBackendGetRoomList        = "/api/room/status-list"
+	LiveRecordBackendGetRoomList  = "/api/room/list"
+	LiveRecordBackendRoomInfo     = "/api/room/info"
 )
 
 const (
