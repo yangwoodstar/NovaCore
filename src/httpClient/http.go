@@ -2,6 +2,7 @@ package httpClient
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 )
 
 // ProcessPost 处理 POST 请求
-func ProcessPost(url, data, sn, appCode, accessKey string) ([]byte, error) {
+func ProcessPost(url, data, sn, appCode, accessKey string, options ...func(*http.Request)) ([]byte, error) {
 
 	client := &http.Client{
 		Timeout: 3 * time.Second,
@@ -32,6 +33,11 @@ func ProcessPost(url, data, sn, appCode, accessKey string) ([]byte, error) {
 	}
 	if accessKey != "" {
 		req.Header.Set("x-access-key", accessKey)
+	}
+
+	// 应用请求选项
+	for _, option := range options {
+		option(req)
 	}
 
 	// 发送请求
@@ -59,7 +65,7 @@ func ProcessPost(url, data, sn, appCode, accessKey string) ([]byte, error) {
 }
 
 // ProcessGet 处理 GET 请求
-func ProcessGet(urlStr, sn, appCode, accessKey string, params map[string]string) ([]byte, error) {
+func ProcessGet(urlStr, sn, appCode, accessKey string, params map[string]string, options ...func(*http.Request)) ([]byte, error) {
 	// 构建查询字符串
 	queryString := ""
 	if params != nil {
@@ -95,6 +101,11 @@ func ProcessGet(urlStr, sn, appCode, accessKey string, params map[string]string)
 		req.Header.Set("x-access-key", accessKey)
 	}
 
+	// 应用请求选项
+	for _, option := range options {
+		option(req)
+	}
+
 	// 发送请求
 	resp, err := client.Do(req)
 	if err != nil {
@@ -117,5 +128,16 @@ func ProcessGet(urlStr, sn, appCode, accessKey string, params map[string]string)
 		return body, nil
 	} else {
 		return []byte(""), fmt.Errorf("response status code: %d", resp.StatusCode)
+	}
+}
+
+// WithBasicAuth 设置Basic认证信息
+func WithBasicAuth(username, password string) func(*http.Request) {
+	return func(req *http.Request) {
+		if username != "" || password != "" {
+			auth := username + ":" + password
+			encodedAuth := base64.StdEncoding.EncodeToString([]byte(auth))
+			req.Header.Set("Authorization", "Basic "+encodedAuth)
+		}
 	}
 }
