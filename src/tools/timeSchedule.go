@@ -38,3 +38,29 @@ func nextTriggerTime(targetWeekday time.Weekday, targetHour, targetMinute int) t
 
 	return t
 }
+
+// ScheduleDaily 启动每日定时任务
+func ScheduleDaily(targetHour, targetMinute, targetSecond int, task func()) {
+	go func() {
+		for {
+			next := nextDailyTriggerTime(targetHour, targetMinute, targetSecond)
+			timer := time.NewTimer(time.Until(next))
+			<-timer.C
+			task()
+		}
+	}()
+}
+
+// nextDailyTriggerTime 计算下个触发时间点（精确到秒）
+func nextDailyTriggerTime(h, m, s int) time.Time {
+	now := time.Now()
+
+	// 构造今日目标时间
+	today := time.Date(now.Year(), now.Month(), now.Day(), h, m, s, 0, now.Location())
+
+	// 若当前时间已过今日目标时间，则设置为明日
+	if now.After(today) {
+		return today.Add(24 * time.Hour)
+	}
+	return today
+}
