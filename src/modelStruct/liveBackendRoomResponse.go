@@ -3,10 +3,6 @@ package modelStruct
 import "time"
 
 // 主响应结构体
-type Response struct {
-	Code int      `json:"code"`
-	Data RoomData `json:"data"`
-}
 
 type RoomData struct {
 	ID                uint32     `json:"id"`

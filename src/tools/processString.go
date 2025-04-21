@@ -10,3 +10,12 @@ func JoinStrings(s ...string) string {
 	}
 	return builder.String()
 }
+
+func ExtractPath(fullPath string) string {
+	parts := strings.Split(fullPath, "/")
+	if len(parts) == 0 {
+		return fullPath
+	}
+	// 去除最后一个部分（如playlist.mpd）
+	return strings.Join(parts[:len(parts)-1], "/")
+}
