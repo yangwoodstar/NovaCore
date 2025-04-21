@@ -55,6 +55,8 @@ type RoomInfoRequest struct {
 type FLVItem struct {
 	Name string `json:"name"` // 必须字段，名称
 	URL  string `json:"url"`  // 必须字段，URL 地址
+	Size int64  `json:"size"`
+	Type int32  `json:"type"`
 }
 
 type Dash struct {
