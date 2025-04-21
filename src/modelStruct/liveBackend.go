@@ -62,9 +62,10 @@ type Dash struct {
 }
 
 type PlayBackInfo struct {
-	SignalFile string    `json:"signalFile"` // 必须字段
-	Dash       Dash      `json:"dash"`       // 必须字段，具体结构根据业务补充
-	Flv        []FLVItem `json:"flv"`        // 必须字段，具体结构根据业务补充
+	SignalFile     string    `json:"signalFile"` // 必须字段
+	SignalFileSize int64     `json:"signalFileSize"`
+	Dash           Dash      `json:"dash"` // 必须字段，具体结构根据业务补充
+	Flv            []FLVItem `json:"flv"`  // 必须字段，具体结构根据业务补充
 }
 
 type ScreenWatermark struct {
