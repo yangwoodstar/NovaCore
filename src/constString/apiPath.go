@@ -89,3 +89,7 @@ const (
 const (
 	Region = "cn-beijing"
 )
+
+const (
+	PlaybackInfo = "/api/play-back/pb-info"
+)

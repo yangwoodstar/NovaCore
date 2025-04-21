@@ -51,3 +51,54 @@ type RoomInfoRequest struct {
 	ParentRoomID string `json:"parentRoomId"`
 	RoomName     string `json:"roomName"`
 }
+
+type FLVItem struct {
+	Name string `json:"name"` // 必须字段，名称
+	URL  string `json:"url"`  // 必须字段，URL 地址
+}
+
+type Dash struct {
+	Dash string `json:"dash"` // 必须字段，Dash 地址
+}
+
+type PlayBackInfo struct {
+	SignalFile string    `json:"signalFile"` // 必须字段
+	Dash       Dash      `json:"dash"`       // 必须字段，具体结构根据业务补充
+	Flv        []FLVItem `json:"flv"`        // 必须字段，具体结构根据业务补充
+}
+
+type ScreenWatermark struct {
+	Hidden bool `json:"hidden"` // 必须字段，水印地址
+}
+
+type QueryPlaybackInfo struct {
+	ParentRoomID     string          `json:"parentRoomId"`
+	RoomID           string          `json:"roomId"`
+	AppID            string          `json:"appId"`
+	ParentVideoID    int             `json:"parentVideoId"`
+	Size             int             `json:"size,omitempty"`
+	TranscodeDur     int             `json:"transcodeDur,omitempty"`
+	Duration         int             `json:"duration,omitempty"`
+	FirstFrame       string          `json:"firstFrame,omitempty"`
+	ID               int             `json:"id"`
+	Name             string          `json:"name"`
+	EncodeStatus     int             `json:"encodeStatus"`
+	CoursewareWidth  int             `json:"coursewareWidth"`
+	CoursewareHeight int             `json:"coursewareHeight"`
+	TeacherWidth     int             `json:"teacherWidth"`
+	TeacherHeight    int             `json:"teacherHeight"`
+	HRatioCourseware int             `json:"hRatioCourseware"`
+	HRatioTeacher    int             `json:"hRatioTeacher"`
+	Width            int             `json:"width"`
+	Height           int             `json:"height"`
+	CreateAt         string          `json:"createAt"`
+	UpdateAt         string          `json:"updateAt"`
+	PlayBackInfo     PlayBackInfo    `json:"playBackInfo"`
+	ScreenWatermark  ScreenWatermark `json:"screenWatermark"` // 根据实际情况使用具体结构体或类型
+}
+
+type QueryPlaybackInfoResponse struct {
+	Code    int               `json:"code"`
+	Message string            `json:"message"`
+	Data    QueryPlaybackInfo `json:"data"`
+}
