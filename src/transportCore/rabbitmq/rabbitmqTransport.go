@@ -112,7 +112,6 @@ func (rt *TransportRabbitMQ) monitorReconnect() {
 	if err := <-rt.errorChan; err != nil {
 		rt.reConnect = true
 		rt.logger.Info("Start reconnect consuming")
-		time.Sleep(1 * time.Second)
 		if err := rt.Reconnect(); err != nil {
 			rt.logger.Error("Reconnect error", zap.Error(err))
 		}
@@ -122,7 +121,10 @@ func (rt *TransportRabbitMQ) monitorReconnect() {
 
 func (rt *TransportRabbitMQ) Reconnect() error {
 	rt.logger.Info("Reconnect")
-	rt.Close()
+	if !rt.conn.IsClosed() {
+		rt.Close()
+	}
+
 	if err := rt.Connect(); err != nil {
 		rt.logger.Error("Reconnect error", zap.Error(err))
 		return err
@@ -232,6 +234,7 @@ func (rt *TransportRabbitMQ) consumeMessages(configInfo *ConfigRabbitMQInfo, cha
 			rt.msgChan <- m
 		}
 		rt.logger.Info("Close msg channel", zap.Any("configInfo", configInfo))
+		rt.Close()
 	}(deliveries)
 
 	return nil
