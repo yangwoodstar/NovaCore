@@ -39,7 +39,9 @@ const (
 )
 
 const (
-	AiMathPath = "/callback/live/upload/result"
+	AiMathPath                 = "/callback/live/upload/result"
+	AiMathAutoRecordStopPath   = "/callback/live/recordStop"
+	AiMathAutoRecordUploadPath = "/callback/live/recordUploadDone"
 )
 
 const (
@@ -84,6 +86,7 @@ const (
 	EventUserScreenAudioStreamStop  = "UserScreenAudioStreamStop"
 	EventRecordUploadDone           = "RecordUploadDone"
 	EventSnapshotRealTimeData       = "SnapshotRealTimeData"
+	EventRecordStopped              = "RecordStopped"
 )
 
 const (
