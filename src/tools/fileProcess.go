@@ -78,3 +78,11 @@ func GetFileSize(filePath string) (int64, error) {
 	// 获取文件大小
 	return fileInfo.Size(), nil
 }
+
+func RemoveFile(filePath string) error {
+	err := os.Remove(filePath)
+	if err != nil {
+		return err
+	}
+	return nil
+}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/volcengine/ve-tos-golang-sdk/v2/tos"
+	"github.com/yangwoodstar/NovaCore/src/api"
 	"github.com/yangwoodstar/NovaCore/src/modelStruct"
 	"github.com/yangwoodstar/NovaCore/src/tools"
 	"go.uber.org/zap"
@@ -24,6 +25,26 @@ type TosClient struct {
 	TosContext context.Context
 	TosInfo    *TosInfo
 	Logger     *zap.Logger
+}
+
+type PrivateInfo struct {
+	URL       string
+	AppCode   string
+	AccessKey string
+	SN        string
+	Private   bool
+}
+
+func NewPrivateTosClient(info *PrivateInfo, logger *zap.Logger) (*TosClient, error) {
+	privateAkSk := &modelStruct.Credentials{}
+	var err error
+	privateAkSk, err = api.GenerateAKSK(info.URL, info.SN, info.AppCode, info.AccessKey)
+	if err != nil {
+		logger.Error("Error generating AKSK", zap.String("error", err.Error()))
+		return nil, err
+	}
+
+	return NewInternalTosClient(privateAkSk, info.Private, logger)
 }
 
 func NewInternalTosClient(cms *modelStruct.Credentials, private bool, logger *zap.Logger) (*TosClient, error) {

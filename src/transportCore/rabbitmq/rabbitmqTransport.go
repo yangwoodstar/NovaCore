@@ -272,6 +272,7 @@ func (rt *TransportRabbitMQ) Write(msg []byte, exchange, routerKey string, prior
 		err := rt.channel.Publish(exchange, routerKey, false, false, p)
 		if err != nil {
 			rt.logger.Error("Error in Publishing", zap.Error(err), zap.Any("msg", msg), zap.String("exchange", exchange))
+			// 这里可以选择重试或者其他处理方式
 			return fmt.Errorf("Error in Publishing: %w", err)
 		}
 	} else {
