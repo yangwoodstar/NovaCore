@@ -7,7 +7,7 @@ type FakeLiveTask struct {
 	Name            string       `json:"name"`
 	ClassType       int          `json:"classType"`
 	LiveType        int          `json:"liveType"`
-	TeacherID       string       `json:"teacherID"`
+	TeacherID       string       `json:"teacherId"` // 修正标签为"teacherId"
 	TeacherName     string       `json:"teacherName"`
 	StartTime       int64        `json:"startTime"`
 	EndTime         int64        `json:"endTime"`
@@ -16,10 +16,10 @@ type FakeLiveTask struct {
 	OssPath         OssPath      `json:"ossPath"`
 	FakeLiveInfo    FakeLiveInfo `json:"fakeLiveInfo"`
 	VideoSourceType int          `json:"videoSourceType"`
-	VideoID         string       `json:"videoID"`
+	VideoID         string       `json:"videoId"` // 修正标签为"videoId"
 	Ts              int64        `json:"ts"`
 	Kill            bool         `json:"kill"`
-	ProcessType     int          `json:"processType"` //0: 停止 1: 开始 2: 刷新
+	ProcessType     int          `json:"processType"`
 	Width           int          `json:"width"`
 	Height          int          `json:"height"`
 }
