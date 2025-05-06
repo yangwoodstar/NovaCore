@@ -13,6 +13,9 @@ func GetTimeStamp() int64 {
 	return time.Now().UnixNano() / int64(time.Millisecond)
 }
 
+func GetSecondTimeStamp() int64 {
+	return time.Now().Unix()
+}
 func GenerateUUID() string {
 	// 生成一个新的 UUID
 	uuidInstance := uuid.New()
