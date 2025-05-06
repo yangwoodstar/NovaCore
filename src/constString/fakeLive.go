@@ -14,3 +14,20 @@ const (
 	ApiLiveStop    = 8
 	ApiLiveRestart = 9
 )
+
+const (
+	FakeLiveCreateCheckTask = "createCheckTask"
+	FakeLiveDeleteTask      = "deleteTask"
+)
+
+const LuaCreateTask = `
+local taskKey = ARGV[1]
+local result = redis.call('SETNX', taskKey, 1)  -- 自动实现原子性检查+设置
+return result == 1 and 0 or 1
+`
+
+const LuaDeleteTask = `
+local taskKey = ARGV[1]
+local result = redis.call('DEL', taskKey)  -- 删除任务
+return result == 1 and 0 or 1
+`
