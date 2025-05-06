@@ -60,7 +60,8 @@ type FLVItem struct {
 }
 
 type Dash struct {
-	Dash string `json:"dash"` // 必须字段，Dash 地址
+	Dash   string `json:"dash"`             // 必须字段，Dash 地址
+	Origin string `json:"origin,omitempty"` // 必须字段，origin 地址
 }
 
 type PlayBackInfo struct {
