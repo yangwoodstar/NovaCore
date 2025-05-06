@@ -8,4 +8,8 @@ const (
 	FakeLiveToRtc     = 4
 	FakeLiveSendStart = 5
 	FakeLiveSendStop  = 6
+
+	ApiLiveStart   = 7
+	ApiLiveStop    = 8
+	ApiLiveRestart = 9
 )
