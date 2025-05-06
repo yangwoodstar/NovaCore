@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/yangwoodstar/NovaCore/src/api"
 	"github.com/yangwoodstar/NovaCore/src/core/instanceAllocator"
+	"github.com/yangwoodstar/NovaCore/src/test"
 	"github.com/yangwoodstar/NovaCore/src/transportCore"
 	"github.com/yangwoodstar/NovaCore/src/transportCore/kafka"
 	"github.com/yangwoodstar/NovaCore/src/transportCore/rabbitmq"
@@ -236,6 +237,9 @@ func TestDingTalk() {
 	fmt.Printf("Response: %s\n", response)
 }
 func main() {
+	//test.CreateLiveApiTest()
+	test.ListLiveApiTest()
+	//test.DeleteLiveApiTest()
 	//Test()
-	TestDingTalk()
+	//TestDingTalk()
 }
