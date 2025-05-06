@@ -1,6 +1,7 @@
 package constString
 
 const (
+	FakeLiveNormal    = 100
 	FakeLiveStop      = 0
 	FakeLiveStart     = 1
 	FakeLiveRestart   = 2
