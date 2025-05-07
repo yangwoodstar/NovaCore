@@ -102,7 +102,9 @@ func SendRequest(connectionRequest ConnectionRequest, request *modelStruct.Reque
 	response := &modelStruct.ResponseModel{}
 
 	reqExecutor := func() error {
-		return connectionRequest.Request(request, response, context.Background())
+		ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+		defer cancel()
+		return connectionRequest.Request(request, response, ctx)
 	}
 
 	errCallback := func(errMsg error, index int) error {
