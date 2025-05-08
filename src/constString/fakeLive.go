@@ -18,6 +18,9 @@ const (
 const (
 	FakeLiveCreateCheckTask = "createCheckTask"
 	FakeLiveDeleteTask      = "deleteTask"
+	FakeLiveStartTask       = "startTask"
+	FakeLiveStopTask        = "stopTask"
+	FakeLiveRestartTask     = "restartTask"
 )
 
 const LuaCreateTask = `
