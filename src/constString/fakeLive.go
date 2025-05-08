@@ -21,6 +21,8 @@ const (
 	FakeLiveStartTask       = "startTask"
 	FakeLiveStopTask        = "stopTask"
 	FakeLiveRestartTask     = "restartTask"
+	FakeLiveSendStartTask   = "sendStartTask"
+	FakeLiveSendStopTask    = "sendStopTask"
 )
 
 const LuaCreateTask = `
