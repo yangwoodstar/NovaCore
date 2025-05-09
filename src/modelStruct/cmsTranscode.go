@@ -36,11 +36,12 @@ type QueryFilePath struct {
 }
 
 type MediaData struct {
-	FileName string `json:"fileName"`
-	FileSize int    `json:"fileSize"`
-	Cover    string `json:"cover"`
-	Dash     string `json:"dash"`
-	Duration int    `json:"duration"`
+	FileName string    `json:"fileName"`
+	FileSize int       `json:"fileSize"`
+	Cover    string    `json:"cover"`
+	Dash     string    `json:"dash"`
+	Duration int       `json:"duration"`
+	PlayList []FLVItem `json:"playList"`
 }
 
 type TransferCodeMeta struct {
