@@ -29,3 +29,50 @@ type RoleDetail struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
+
+type QueryFilePath struct {
+	FileKey  string `json:"fileKey"`
+	ParentId int64  `json:"parentId"`
+}
+
+type MediaData struct {
+	FileName string `json:"fileName"`
+	FileSize int    `json:"fileSize"`
+	Cover    string `json:"cover"`
+	Dash     string `json:"dash"`
+	Duration int    `json:"duration"`
+}
+
+type TransferCodeMeta struct {
+	FileType string    `json:"fileType"`
+	Data     MediaData `json:"data"`
+}
+
+type SaveFileInfo struct {
+	FileKey          string           `json:"fileKey"`
+	OriginFileId     int64            `json:"originFileId"`
+	Percent          int              `json:"percent"`
+	TransferCodeMeta TransferCodeMeta `json:"transferCodeMeta"`
+}
+
+type MqSaveFileInfo struct {
+	FileId           int64            `json:"fileId"`
+	TransferStatus   int64            `json:"transferStatus"`
+	Percent          int64            `json:"percent"`
+	TransferCodeMeta TransferCodeMeta `json:"transferCodeMeta"`
+}
+
+type UploadFileInfo struct {
+	DirId            int64  `json:"dirId"`
+	FileName         string `json:"fileName"`
+	FileSize         int    `json:"fileSize"`
+	ContentSign      string `json:"contentSign"`
+	TransferPriority int    `json:"transferPriority"`
+}
+
+type QueryFileInfo struct {
+	FileName     string   `json:"fileName"`
+	DirPaths     []string `json:"dirPaths"`
+	OriginFileId int64    `json:"originFileId"`
+	Type         int      `json:"type"`
+}
