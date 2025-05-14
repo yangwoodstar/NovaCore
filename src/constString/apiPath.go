@@ -87,6 +87,7 @@ const (
 	EventRecordUploadDone           = "RecordUploadDone"
 	EventSnapshotRealTimeData       = "SnapshotRealTimeData"
 	EventRecordStopped              = "RecordStopped"
+	EventRecordStarted              = "RecordStarted"
 )
 
 const (
