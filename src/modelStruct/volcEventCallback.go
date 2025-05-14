@@ -15,6 +15,33 @@ type MainEventModel struct {
 	BusinessId string `json:"BusinessId,omitempty"`
 }
 
+type StartRecordStreamModel struct {
+	UserId     string `json:"UserId"`
+	StreamType int    `json:"StreamType"`
+}
+
+type StartRecordCallbackModel struct {
+	Vid         string                   `json:"Vid"`
+	Duration    int                      `json:"Duration"`
+	Size        int                      `json:"Size"`
+	StartTime   int64                    `json:"StartTime"`
+	StreamList  []StartRecordStreamModel `json:"StreamList"`
+	VideoCodec  string                   `json:"VideoCodec"`
+	AudioCodec  string                   `json:"AudioCodec"`
+	VideoWidth  int                      `json:"VideoWidth"`
+	VideoHeight int                      `json:"VideoHeight"`
+}
+
+type StartRecordEventDataModel struct {
+	AppId          string                     `json:"AppId"`
+	BusinessId     string                     `json:"BusinessId"`
+	RoomId         string                     `json:"RoomId"`
+	TaskId         string                     `json:"TaskId"`
+	Code           int                        `json:"Code"`
+	ErrorMessage   string                     `json:"ErrorMessage"`
+	RecordFileList []StartRecordCallbackModel `json:"RecordFileList"`
+}
+
 // EventData 字段对应的结构体（需二次解析）
 type StopRecordEventDataModel struct {
 	AppId          string                    `json:"AppId"`
