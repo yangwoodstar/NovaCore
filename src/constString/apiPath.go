@@ -35,7 +35,10 @@ const (
 )
 
 const (
-	AiEnglishFinishPath = "/athena/record/finish"
+	AiEnglishFinishPath        = "/athena/record/finish"
+	AIMathCallbackPath         = "/callback/live/recordClip"
+	AIEnglishStartCallbackPath = "/athena/record/start"
+	AIEnglishEndCallbackPath   = "/athena/record/stop"
 )
 
 const (
