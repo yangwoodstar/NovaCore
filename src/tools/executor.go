@@ -2,6 +2,7 @@ package tools
 
 import (
 	"bytes"
+	"fmt"
 	"os/exec"
 )
 
@@ -26,12 +27,14 @@ func (ce *CommandExecutor) Run(command string, args ...string) error {
 	cmd := exec.Command(ce.Command, ce.Args...)
 	cmd.Stdout = &ce.Stdout
 	cmd.Stderr = &ce.Stderr
-
+	fmt.Println("Command:", cmd.String())
 	if err := cmd.Start(); err != nil {
+		fmt.Println("Error starting command:", err)
 		return err
 	}
 
 	if err := cmd.Wait(); err != nil {
+		fmt.Println("Command finished with error:", err)
 		return err
 	}
 
