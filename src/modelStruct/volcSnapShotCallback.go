@@ -1,9 +1,9 @@
 package modelStruct
 
 type StreamInfo struct {
-	Index      uint32 `json:"Index"`      // 流索引
+	Index      int32  `json:"Index"`      // 流索引
 	UserId     string `json:"UserId"`     // 用户 ID
-	StreamType uint32 `json:"StreamType"` // 流类型
+	StreamType int32  `json:"StreamType"` // 流类型
 }
 
 type ImageData struct {

@@ -358,3 +358,7 @@ func (instance *ByteDanceInstance) CreatePullToPushGroup(projectName, groupName,
 
 	return resp, nil
 }
+
+func (instance *ByteDanceInstance) CreateSnapshotPreset() {
+
+}
