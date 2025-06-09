@@ -64,7 +64,7 @@ func (kp *KafkaProducer) handleAsyncResults() {
 		select {
 		case success := <-kp.producer.Successes():
 			if success != nil {
-				kp.logger.Info("Message delivered to topic",
+				kp.logger.Debug("Message delivered to topic",
 					zap.String("topic", success.Topic),
 					zap.Int32("partition", success.Partition),
 					zap.Int64("offset", success.Offset))
@@ -133,7 +133,7 @@ func (kp *KafkaProducer) Write(message []byte, topic, routerKey string, priority
 	}
 	kp.mu.Unlock()
 
-	kp.logger.Info("Publish message", zap.String("topic", topic), zap.String("parentRoomID", routerKey), zap.Int("priority", priority))
+	kp.logger.Debug("Publish message", zap.String("topic", topic), zap.String("parentRoomID", routerKey), zap.Int("priority", priority))
 	msg := &sarama.ProducerMessage{
 		Topic:     topic,
 		Key:       sarama.StringEncoder(routerKey),
