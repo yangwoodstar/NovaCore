@@ -9,6 +9,7 @@ type FileTranscode struct {
 	TimeStamp        int64    `json:"timeStamp"`
 	TransferPriority int      `json:"transferPriority"`
 	UserInfo         UserInfo `json:"userInfo"`
+	Cost             int64    `json:"cost"` // 处理时间
 }
 
 type UserInfo struct {
