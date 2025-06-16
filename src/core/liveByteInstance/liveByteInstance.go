@@ -38,6 +38,15 @@ type PullToPushTaskConfig struct {
 	EndOffset        float32
 }
 
+type RtmpSnapshotConfig struct {
+	Domain       string
+	App          string
+	Stream       string
+	Bucket       string
+	StorageDir   string
+	TimeInterval int32
+}
+
 var (
 	defaultLiveInstance *ByteDanceInstance
 	onceLive            sync.Once
@@ -359,6 +368,82 @@ func (instance *ByteDanceInstance) CreatePullToPushGroup(projectName, groupName,
 	return resp, nil
 }
 
-func (instance *ByteDanceInstance) CreateSnapshotPreset() {
+func (instance *ByteDanceInstance) CreateSnapshotPreset(rtmpSnapshotConfig *RtmpSnapshotConfig) {
+	body := &live.CreateSnapshotPresetV2Body{
+		// 域名空间，即直播流地址的域名所属的域名空间。您可以调用 [ListDomainDetail](https://www.volcengine.com/docs/6469/1126815) 接口或在视频直播控制台的[域名管理](https://console.volcengine.com/live/main/domain/list)页面，查看直播流使用的域名所属的域名空间。
+		Vhost: rtmpSnapshotConfig.Domain,
+		// 应用名称，取值与直播流地址中 AppName 字段取值相同。支持由大小写字母（A - Z、a - z）、数字（0 - 9）、下划线（_）、短横线（-）和句点（.）组成，长度为 1 到 30 个字符。
+		App: rtmpSnapshotConfig.App,
+		// 截图配置的生效状态，取值及含义如下所示。
+		// <li> 1：（默认值）生效； </li>
+		// <li> 0：不生效。 </li>
+		Status: Int32Ptr(1),
+	}
 
+	// 截图配置的详细参数配置。
+	SnapshotPresetConfig := live.CreateSnapshotPresetV2BodySnapshotPresetConfig{
+		// 截图间隔时间，单位为秒，默认值为 10，取值范围为正整数。
+		Interval: Int32Ptr(rtmpSnapshotConfig.TimeInterval),
+	}
+
+	// 图片格式为 JPEG 时的截图参数，开启 JPEG 截图时设置。
+	// note：
+	// JPEG 截图和 JPG 截图必须开启且只能开启一个。
+	JpegParam := live.CreateSnapshotPresetV2BodySnapshotPresetConfigJPEGParam{
+		// 当前格式的截图是否开启，取值及含义如下所示。
+		// <li> false：（默认值）不开启； </li>
+		// <li> true：开启。 </li>
+		Enable: BoolPtr(true),
+	}
+
+	// 截图存储到 TOS 时的配置。
+	// note：
+	// TOSParam 和 ImageXParam 配置且配置其中一个。
+	TOSParam := live.CreateSnapshotPresetV2BodySnapshotPresetConfigJPEGParamTOSParam{
+		// 截图是否使用 TOS 存储，取值及含义如下所示。
+		// <li> false：（默认值）不使用； </li>
+		// <li> true：使用。 </li>
+		Enable: BoolPtr(true),
+		// TOS 存储对应的 Bucket。
+		// 例如，存储路径为 live-test-tos-example/live/liveapp 时，Bucket 取值为 live-test-tos-example。
+		// note：
+		// 使用 TOS 存储时 Bucket 为必填项。
+		Bucket: StringPtr(rtmpSnapshotConfig.Bucket),
+		// ToS 存储对应的 Bucket 下的存储目录，默认为空。
+		// 例如，存储位置为 live-test-tos-example/live/liveapp 时，StorageDir 取值为 live/liveapp。
+		StorageDir: StringPtr(rtmpSnapshotConfig.StorageDir),
+		// 存储方式为实时截图时的存储规则，支持以 {Domain}/{App}/{Stream}/{UnixTimestamp} 样式设置存储规则，支持输入字母、数字、-、!、_、.、* 及占位符。
+		// note：
+		// 参数 ExactObject 和 OverwriteObject 传且仅传一个。
+		//ExactObject: StringPtr("{Domain}/{App}/{Stream}/{UnixTimestamp}"),
+		// 存储方式为覆盖截图时的存储规则，支持以 {Domain}/{App}/{Stream} 样式设置存储规则，支持输入字母、数字、-、!、_、.、* 及占位符。
+		// note：
+		// 参数 ExactObject 和 OverwriteObject 传且仅传一个。
+		OverwriteObject: StringPtr("{Domain}/{App}/{Stream}"),
+	}
+
+	JpegParam.TOSParam = &TOSParam
+
+	// 截图存储到 veImageX 时的配置。
+	// note：
+	// TOSParam 和 ImageXParam 配置且配置其中一个。
+
+	SnapshotPresetConfig.JPEGParam = &JpegParam
+
+	// 截图格式为 JPG 时的截图参数，开启 JPG 截图时设置。
+	// note：
+	// JPEG 截图和 JPG 截图必须开启且只能开启一个。
+	//JpgParam := live.CreateSnapshotPresetV2BodySnapshotPresetConfigJpgParam{}
+
+	//SnapshotPresetConfig.JpgParam = &JpgParam
+
+	body.SnapshotPresetConfig = SnapshotPresetConfig
+
+	resp, err := instance.Live.CreateSnapshotPresetV2(context.Background(), body)
+
+	if err != nil {
+		fmt.Printf("error %v", err)
+	} else {
+		fmt.Printf("success %+v", resp)
+	}
 }

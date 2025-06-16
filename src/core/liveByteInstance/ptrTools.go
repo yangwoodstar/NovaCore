@@ -8,6 +8,10 @@ func Int32Ptr(v int32) *int32 {
 	return &v
 }
 
+func BoolPtr(v bool) *bool {
+	return &v
+}
+
 func StringPtrs(vals []string) []*string {
 	ptrs := make([]*string, len(vals))
 	for i := 0; i < len(vals); i++ {
