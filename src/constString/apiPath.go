@@ -100,3 +100,8 @@ const (
 const (
 	PlaybackInfo = "/api/play-back/pb-info"
 )
+
+const (
+	FakeLiveStartReport = "/api/report/fakeLiveStart"
+	FakeLiveStopReport  = "/api/report/fakeLiveStop"
+)
