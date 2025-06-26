@@ -48,3 +48,19 @@ func GetRandomString(length int) (string, error) {
 
 	return string(byteArray), nil
 }
+
+// 获取格式化时间字符串（默认本地时区）
+func GetTimeString(format string) string {
+	if format == "" {
+		format = "2006-01-02 15:04:05" // 设置默认格式
+	}
+	return time.Now().Format(format)
+}
+
+// 获取UTC时间字符串（带时区信息）
+func GetUTCTimeString(format string) string {
+	if format == "" {
+		format = "2006-01-02T15:04:05Z07:00" // ISO8601格式
+	}
+	return time.Now().UTC().Format(format)
+}
