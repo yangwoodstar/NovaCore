@@ -36,3 +36,8 @@ func SendWaningMessage(url, message, mobile string) (string, error) {
 	}
 	return string(response), nil
 }
+
+func ServerRestart(url, mobile, name, id, startTime string) (string, error) {
+	sendWarning := fmt.Sprintf("服务启动通知    \n 服务名称: %s      \n 服务标识: %s      \n 启动时间:%s      \n", name, id, startTime)
+	return SendWaningMessage(url, sendWarning, mobile)
+}
