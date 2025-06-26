@@ -64,7 +64,7 @@ func (kp *KafkaProducer) handleAsyncResults() {
 		select {
 		case success := <-kp.producer.Successes():
 			if success != nil {
-				kp.logger.Debug("Message delivered to topic",
+				kp.logger.Info("Message delivered to topic",
 					zap.String("topic", success.Topic),
 					zap.Int32("partition", success.Partition),
 					zap.Int64("offset", success.Offset))
