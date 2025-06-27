@@ -1,11 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/yangwoodstar/NovaCore/src/api"
+	"github.com/yangwoodstar/NovaCore/src/constString"
 	"github.com/yangwoodstar/NovaCore/src/core/instanceAllocator"
-	"github.com/yangwoodstar/NovaCore/src/test"
+	"github.com/yangwoodstar/NovaCore/src/modelStruct"
 	"github.com/yangwoodstar/NovaCore/src/transportCore"
 	"github.com/yangwoodstar/NovaCore/src/transportCore/kafka"
 	"github.com/yangwoodstar/NovaCore/src/transportCore/rabbitmq"
@@ -214,32 +214,53 @@ type DingTalkMessage struct {
 
 func TestDingTalk() {
 	//url := "https://oapi.dingtalk.com/robot/send?access_token=your_access_token"
-	//url := ""
 	url := ""
 
-	mobile := "13155154441"
-	dingTalkMessage := DingTalkMessage{
-		MsgType: "live",
-		Message: "this is a test message",
-	}
+	/*	mobile := ""
+			dingTalkMessage := DingTalkMessage{
+				MsgType: "live",
+				Message: "this is a test message",
+			}
 
-	message, err := json.Marshal(dingTalkMessage)
-	if err != nil {
-		log.Fatalf("Failed to marshal message: %v", err)
-	}
+			message, err := json.Marshal(dingTalkMessage)
+			if err != nil {
+				log.Fatalf("Failed to marshal message: %v", err)
+			}
 
-	//message = []byte("### 测试消息\nHello, this is a test message.") // 直接传递Markdown内容
-	message = []byte("1234567890") // 直接传递Markdown内容
-	response, err := api.SendWaningMessage(url, string(message), mobile)
+		message = []byte("### 测试消息\nHello, this is a test message.") // 直接传递Markdown内容
+		message = []byte("### <font color=orange>[P1-严重]</font> 订单服务响应超时\\n> **影响范围**: 用户支付功能\\n> **建议操作**: 检查网关及服务日志") // 直接传递Markdown内容
+		response, err := api.SendWaningMessage(url, string(message), mobile)
+		if err != nil {
+			log.Fatalf("Failed to send message: %v", err)
+		}
+		fmt.Printf("Response: %s\n", response)
+	*/
+	warningInfo := modelStruct.WarningInfo{
+		Level:   constString.P0,
+		Title:   "测试标题",
+		Time:    time.Now().Format(time.RFC3339),
+		Details: "测试详情",
+		Advice:  "测试建议",
+		Env:     "测试环境",
+		Message: "测试消息",
+		Owners:  []string{"1234567890", "1234567890"},
+	}
+	alertMsg := api.GenerateAlert(warningInfo)
+	res, err := api.SendDingTalkAlert(url, alertMsg)
 	if err != nil {
 		log.Fatalf("Failed to send message: %v", err)
 	}
-	fmt.Printf("Response: %s\n", response)
+	fmt.Printf("Response: %s\n", res)
+
+}
+
+func WarningTest() {
+
 }
 func main() {
 	//test.CreateLiveApiTest()
-	test.ListLiveApiTest()
+	//test.ListLiveApiTest()
 	//test.DeleteLiveApiTest()
 	//Test()
-	//TestDingTalk()
+	TestDingTalk()
 }

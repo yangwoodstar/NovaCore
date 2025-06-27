@@ -5,8 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e37a4c2c-1c6b-4691-880b-8d327039da9f" name="更改" comment="">
+      <change afterPath="$PROJECT_DIR$/src/constString/dingTalk.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/transportCore/kafka/kafkaTransport.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/transportCore/kafka/kafkaTransport.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/dingTalk.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/dingTalk.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/example/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/example/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/modelStruct/dingTalk.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/modelStruct/dingTalk.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -54,7 +57,7 @@
   }
 }</component>
   <component name="RunManager">
-    <configuration name="example" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <configuration name="example" type="GoApplicationRunConfiguration" factoryName="Go Application" temporary="true">
       <module name="NovaCore" />
       <working_directory value="$PROJECT_DIR$" />
       <kind value="FILE" />
@@ -63,6 +66,11 @@
       <filePath value="$PROJECT_DIR$/src/example/main.go" />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Go 构建.example" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
