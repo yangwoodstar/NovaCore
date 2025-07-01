@@ -5,6 +5,7 @@ import (
 	"github.com/yangwoodstar/NovaCore/src/api"
 	"github.com/yangwoodstar/NovaCore/src/constString"
 	"github.com/yangwoodstar/NovaCore/src/core/instanceAllocator"
+	"github.com/yangwoodstar/NovaCore/src/httpClient"
 	"github.com/yangwoodstar/NovaCore/src/modelStruct"
 	"github.com/yangwoodstar/NovaCore/src/transportCore"
 	"github.com/yangwoodstar/NovaCore/src/transportCore/kafka"
@@ -257,10 +258,30 @@ func TestDingTalk() {
 func WarningTest() {
 
 }
+
+func TestHttpMethod() {
+	url := "http://172.17.56.159:3000/getToken"
+	response, err := httpClient.ProcessPost(url, "", "", "", "")
+	if err != nil {
+		fmt.Printf("Failed to send POST request: %v\n", err)
+	} else {
+		fmt.Printf("Response: %s\n", response)
+	}
+
+	url = "http://172.17.56.159:3000/template1"
+	response, err = httpClient.ProcessGet(url, "", "", "", nil)
+	if err != nil {
+		fmt.Printf("Failed to send GET request: %v\n", err)
+	} else {
+		fmt.Printf("Response: %s\n", response)
+	}
+
+}
 func main() {
 	//test.CreateLiveApiTest()
 	//test.ListLiveApiTest()
 	//test.DeleteLiveApiTest()
 	//Test()
-	TestDingTalk()
+	//TestDingTalk()
+	TestHttpMethod()
 }

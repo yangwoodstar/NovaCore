@@ -10,21 +10,51 @@ import (
 	"time"
 )
 
-// ProcessPost 处理 POST 请求
-func ProcessPost(url, data, sn, appCode, accessKey string, options ...func(*http.Request)) ([]byte, error) {
+// 新增公共请求执行器
+func executeRequestWithRetry(client *http.Client, req *http.Request, maxRetries int, initialDelay time.Duration) ([]byte, error) {
+	retryDelay := initialDelay
+	var lastErr error
 
-	client := &http.Client{
-		Timeout: 3 * time.Second,
-	}
-	// 创建请求
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer([]byte(data)))
-	if err != nil {
-		return []byte(""), err
-	}
-	// 设置请求头
-	req.Header.Set("Content-type", "application/json")
-	req.Header.Set("charset", "utf-8")
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		resp, err := client.Do(req)
+		if err != nil {
+			lastErr = err
+			if attempt < maxRetries-1 {
+				time.Sleep(retryDelay)
+				retryDelay *= 2
+				continue
+			}
+			break
+		}
 
+		body, err := io.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			lastErr = err
+			if attempt < maxRetries-1 {
+				time.Sleep(retryDelay)
+				retryDelay *= 2
+				continue
+			}
+			break
+		}
+
+		if resp.StatusCode == http.StatusOK {
+			return body, nil
+		}
+		fmt.Println("HTTP request failed with status:", resp.StatusCode, "Response body:", string(body))
+		lastErr = fmt.Errorf("status code: %d", resp.StatusCode)
+		if attempt < maxRetries-1 {
+			time.Sleep(retryDelay)
+			retryDelay *= 2
+		}
+	}
+
+	return nil, fmt.Errorf("after %d attempts: %v", maxRetries, lastErr)
+}
+
+// 公共头设置函数
+func setCommonHeaders(req *http.Request, sn, appCode, accessKey string) {
 	if sn != "" {
 		req.Header.Set("source-sn", sn)
 	}
@@ -33,102 +63,66 @@ func ProcessPost(url, data, sn, appCode, accessKey string, options ...func(*http
 	}
 	if accessKey != "" {
 		req.Header.Set("x-access-key", accessKey)
-	}
-
-	// 应用请求选项
-	for _, option := range options {
-		option(req)
-	}
-
-	// 发送请求
-	resp, err := client.Do(req)
-	if err != nil {
-		return []byte(""), err
-	}
-	defer func(Body io.ReadCloser) {
-		err = Body.Close()
-		if err != nil {
-		}
-	}(resp.Body)
-
-	// 读取响应
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return []byte(""), err
-	}
-
-	if resp.StatusCode == http.StatusOK {
-		return body, nil
-	} else {
-		return []byte(""), fmt.Errorf("response status code: %d", resp.StatusCode)
 	}
 }
 
-// ProcessGet 处理 GET 请求
-func ProcessGet(urlStr, sn, appCode, accessKey string, params map[string]string, options ...func(*http.Request)) ([]byte, error) {
-	// 构建查询字符串
-	queryString := ""
-	if params != nil {
-		queryValues := url.Values{}
-		for key, value := range params {
-			queryValues.Add(key, value)
-		}
-		queryString = "?" + queryValues.Encode()
-	}
-
-	// 创建 HTTP 客户端
+func ProcessPost(urlStr, data, sn, appCode, accessKey string, options ...func(*http.Request)) ([]byte, error) {
 	client := &http.Client{
 		Timeout: 3 * time.Second,
 	}
 
-	// 创建请求
-	requestUrl := urlStr + queryString
-	req, err := http.NewRequest("GET", requestUrl, nil)
+	// 请求对象创建（移出循环）
+	reqBody := bytes.NewBufferString(data)
+	req, err := http.NewRequest("POST", urlStr, reqBody)
 	if err != nil {
-		return []byte(""), err
+		return nil, err
 	}
 
-	// 设置请求头
-	req.Header.Set("Content-type", "application/json")
-	req.Header.Set("charset", "utf-8")
-	if sn != "" {
-		req.Header.Set("source-sn", sn)
-	}
-	if appCode != "" {
-		req.Header.Set("X-App-Code", appCode)
-	}
-	if accessKey != "" {
-		req.Header.Set("x-access-key", accessKey)
-	}
-
-	// 应用请求选项
+	// 请求头设置顺序调整
 	for _, option := range options {
 		option(req)
 	}
 
-	// 发送请求
-	resp, err := client.Do(req)
-	if err != nil {
-		return []byte(""), err
-	}
-	defer func(Body io.ReadCloser) {
-		err = Body.Close()
-		if err != nil {
-		}
-	}(resp.Body) // 确保在函数退出时关闭响应体
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Charset", "utf-8")
+	setCommonHeaders(req, sn, appCode, accessKey)
 
-	// 读取响应
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return []byte(""), err
+	return executeRequestWithRetry(client, req, 3, 100*time.Millisecond)
+}
+
+// ProcessGet 优化版
+func ProcessGet(urlStr, sn, appCode, accessKey string, params map[string]string, options ...func(*http.Request)) ([]byte, error) {
+	client := &http.Client{
+		Timeout: 3 * time.Second,
 	}
 
-	// 检查状态码
-	if resp.StatusCode == http.StatusOK {
-		return body, nil
-	} else {
-		return []byte(""), fmt.Errorf("response status code: %d", resp.StatusCode)
+	// 正确解析原始URL
+	u, err := url.Parse(urlStr)
+	if err != nil {
+		return nil, fmt.Errorf("invalid URL: %w", err)
 	}
+
+	// 合并查询参数
+	query := u.Query()
+	for k, v := range params {
+		query.Add(k, v)
+	}
+	u.RawQuery = query.Encode()
+
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// 移除不必要的Content-Type
+	for _, option := range options {
+		option(req)
+	}
+
+	req.Header.Set("Charset", "utf-8")
+	setCommonHeaders(req, sn, appCode, accessKey)
+
+	return executeRequestWithRetry(client, req, 3, 100*time.Millisecond)
 }
 
 // WithBasicAuth 设置Basic认证信息
