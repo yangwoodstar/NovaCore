@@ -10,9 +10,10 @@ const (
 	FakeLiveSendStart = 5
 	FakeLiveSendStop  = 6
 
-	ApiLiveStart   = 7
-	ApiLiveStop    = 8
-	ApiLiveRestart = 9
+	ApiLiveStart       = 7
+	ApiLiveStop        = 8
+	ApiLiveRestart     = 9
+	FakeLiveTaskDelete = 10
 )
 
 const (
