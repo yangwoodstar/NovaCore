@@ -4,6 +4,8 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -13,6 +15,7 @@ type RtmpConfig struct {
 	Domain      string
 	SecretKey   string
 	MaxIdleTime int64
+	Format      string
 }
 
 func GenerateRtmpUrl(config *RtmpConfig) string {
@@ -26,5 +29,14 @@ func GenerateRtmpUrl(config *RtmpConfig) string {
 	volcSecret := hex.EncodeToString(hash[:])
 	// 构建完整的推流地址
 	rtmpURL := fmt.Sprintf("%s/%s/%s?volcTime=%s&volcSecret=%s", config.Domain, config.AppID, config.StreamName, volcTime, volcSecret)
+	return rtmpURL
+}
+
+func GenerateTencentRtmpUrl(config *RtmpConfig) string {
+	unixTime := time.Now().Unix() + config.MaxIdleTime
+	txTime := strings.ToUpper(strconv.FormatInt(unixTime, 16))
+	txSecret := md5.Sum([]byte(config.SecretKey + config.StreamName + txTime))
+	txSecretStr := fmt.Sprintf("%x", txSecret)
+	rtmpURL := fmt.Sprintf("%s/%s/%s%s?txSecret=%s&txTime=%s", config.Domain, config.AppID, config.StreamName, config.Format, txSecretStr, txTime)
 	return rtmpURL
 }
