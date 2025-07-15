@@ -10,6 +10,7 @@ require (
 	github.com/volcengine/ve-tos-golang-sdk/v2 v2.7.9
 	github.com/volcengine/volc-sdk-golang v1.0.196
 	go.uber.org/zap v1.27.0
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )
 
 require (

@@ -1,18 +1,21 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/yangwoodstar/NovaCore/src/api"
 	"github.com/yangwoodstar/NovaCore/src/constString"
 	"github.com/yangwoodstar/NovaCore/src/core/instanceAllocator"
 	"github.com/yangwoodstar/NovaCore/src/httpClient"
 	"github.com/yangwoodstar/NovaCore/src/modelStruct"
+	"github.com/yangwoodstar/NovaCore/src/tools"
 	"github.com/yangwoodstar/NovaCore/src/transportCore"
 	"github.com/yangwoodstar/NovaCore/src/transportCore/kafka"
 	"github.com/yangwoodstar/NovaCore/src/transportCore/rabbitmq"
 	"go.uber.org/zap"
 	"log"
 	"strconv"
+	"sync"
 	"time"
 )
 
@@ -275,7 +278,14 @@ func TestHttpMethod() {
 	} else {
 		fmt.Printf("Response: %s\n", response)
 	}
+}
 
+func TestSafeGo() {
+	// 测试安全的 goroutine 调用
+	ctx := context.Background()
+	tools.SafeGo(ctx, func(ctx context.Context) {
+		panic("this is test")
+	})
 }
 func main() {
 	//test.CreateLiveApiTest()
@@ -283,5 +293,16 @@ func main() {
 	//test.DeleteLiveApiTest()
 	//Test()
 	//TestDingTalk()
-	TestHttpMethod()
+	//TestHttpMethod()
+	tools.InitLogger("./test.log", "info")
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	ctx := context.Background()
+	tools.SafeGo(ctx, func(ctx context.Context) {
+		defer wg.Done()
+		panic("this is test")
+	})
+
+	wg.Wait()
 }
