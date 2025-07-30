@@ -10,6 +10,7 @@ type FileTranscode struct {
 	TransferPriority int      `json:"transferPriority"`
 	UserInfo         UserInfo `json:"userInfo"`
 	Cost             int64    `json:"cost"` // 处理时间
+	Biz              int      `json:"biz"`  // 业务类型
 }
 
 type UserInfo struct {
