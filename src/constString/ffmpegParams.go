@@ -95,7 +95,7 @@ const (
 	AddAudioParams      = "anullsrc=channel_layout=stereo:sample_rate=44100"
 	AudioDuration       = "-shortest"
 	AddAudioStream      = "1:a"
-	ProfileValue        = "constrained_baseline"
+	ProfileValue        = "baseline"
 )
 
 // probe
