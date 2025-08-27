@@ -307,6 +307,7 @@ func GenerateTxRtmpUrl() {
 	rtmpURL := tools.GenerateTencentRtmpUrl(&config)
 	fmt.Println("Generated RTMP URL:", rtmpURL)
 }
+
 func NacosTest() {
 	// 初始化配置
 	nacosConfig := &liveNacos.NacosConfig{
@@ -335,6 +336,18 @@ func NacosTest() {
 	if content, err := configCenter.GetConfig("live-file-animation-converter.yaml", "test"); err == nil {
 		log.Printf("Initial config: %s\n", content)
 	}
+
+	// 注册配置变更监听器
+	err = configCenter.AddListener("live-file-animation-converter.yaml", "test", func(dataId, group, content string) {
+		log.Printf("Config changed detected!\nNew configuration: %s", content)
+	})
+	if err != nil {
+		log.Fatalf("Failed to add config listener: %v", err)
+	}
+
+	// 保持程序运行
+	log.Println("Application started, waiting for config changes...")
+	select {}
 
 }
 
