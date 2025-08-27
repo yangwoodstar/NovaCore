@@ -287,6 +287,26 @@ func TestSafeGo() {
 		panic("this is test")
 	})
 }
+
+func GenerateVolcRtmpUrl() {
+
+}
+
+func GenerateTxRtmpUrl() {
+	idleTime := time.Now().Unix() + 86400
+	config := tools.RtmpConfig{
+		AppID:       "667d6fff07eb230159c49c02",
+		StreamName:  "v5-gaozhong_20160000076901210003",
+		Domain:      "rtmp://tclivepush.yuaiweiwu.com",
+		SecretKey:   "5c42e85c27a1c14c20b86310d4e5042f",
+		MaxIdleTime: idleTime, // 1小时
+		Format:      "",
+	}
+
+	rtmpURL := tools.GenerateTencentRtmpUrl(&config)
+	fmt.Println("Generated RTMP URL:", rtmpURL)
+}
+
 func main() {
 	//test.CreateLiveApiTest()
 	//test.ListLiveApiTest()
