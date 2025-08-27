@@ -96,6 +96,12 @@ const (
 	AudioDuration       = "-shortest"
 	AddAudioStream      = "1:a"
 	ProfileValue        = "baseline"
+	X264Params          = "-x264-params"
+	BFrame              = "bframes=0"
+	Threads             = "-threads"
+	MovFlags            = "-movflags"
+	MovFlagsValue       = "faststart"
+	Gop                 = "-g"
 )
 
 // probe

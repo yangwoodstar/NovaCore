@@ -5,8 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e37a4c2c-1c6b-4691-880b-8d327039da9f" name="更改" comment="">
-      <change afterPath="$PROJECT_DIR$/src/modelStruct/liveRoom.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/cloudStorage/tosStorage.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/cloudStorage/tosStorage.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/example/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/src/example/main.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/example/tosTest.go" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,7 +22,7 @@
       </list>
     </option>
   </component>
-  <component name="GOROOT" url="file://$USER_HOME$/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.23.6.darwin-arm64" />
+  <component name="GOROOT" url="file:///opt/homebrew/Cellar/go/1.24.3/libexec" />
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>

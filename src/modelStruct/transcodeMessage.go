@@ -22,4 +22,5 @@ type TranscodeInfo struct {
 	OssPath          OssPath  `json:"ossPath"`
 	TaskID           string   `json:"taskID"`
 	Name             string   `json:"name"`
+	RecordType       int      `json:"recordType"`
 }

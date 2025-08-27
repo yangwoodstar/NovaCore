@@ -3,10 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/yangwoodstar/NovaCore/src/api"
+	"github.com/yangwoodstar/NovaCore/src/cloudStorage"
 	"github.com/yangwoodstar/NovaCore/src/constString"
 	"github.com/yangwoodstar/NovaCore/src/core/instanceAllocator"
 	"github.com/yangwoodstar/NovaCore/src/httpClient"
+	"github.com/yangwoodstar/NovaCore/src/liveNacos"
 	"github.com/yangwoodstar/NovaCore/src/modelStruct"
 	"github.com/yangwoodstar/NovaCore/src/tools"
 	"github.com/yangwoodstar/NovaCore/src/transportCore"
@@ -15,7 +18,6 @@ import (
 	"go.uber.org/zap"
 	"log"
 	"strconv"
-	"sync"
 	"time"
 )
 
@@ -110,12 +112,12 @@ func Test() {
 	}
 
 	unifiedTransport = transportCore.NewUnifiedTransport()
-	unifiedTransport.AddSender("test01", rabbitmqInstance)
-	unifiedTransport.AddSender("test02", rabbitmqInstance)
-	unifiedTransport.AddSender("testconsistent01", rabbitmqInstance)
-	unifiedTransport.AddSender("testconsistent02", rabbitmqInstance)
-	unifiedTransport.AddSender("", kafkaInstance)
-	unifiedTransport.AddReceiver("mq", rabbitmqInstance)
+	unifiedTransport.AddSender("", "test01", rabbitmqInstance)
+	unifiedTransport.AddSender("", "test02", rabbitmqInstance)
+	unifiedTransport.AddSender("", "testconsistent01", rabbitmqInstance)
+	unifiedTransport.AddSender("", "testconsistent02", rabbitmqInstance)
+	unifiedTransport.AddSender("", "", kafkaInstance)
+	unifiedTransport.AddReceiver("", "mq", rabbitmqInstance)
 
 	go func() {
 		// Create a ticker that fires every second
@@ -127,11 +129,11 @@ func Test() {
 			<-ticker.C
 
 			// Send messages
-			unifiedTransport.Write([]byte("test01"), "test01", "test01", 0)
-			unifiedTransport.Write([]byte("test02"), "test02", "test02", 0)
+			unifiedTransport.Write([]byte("test01"), "", "test01", "test01", 0)
+			unifiedTransport.Write([]byte("test02"), "", "test02", "test02", 0)
 			//unifiedTransport.Write([]byte("testconsistent01"), "testconsistent01", "consistent01", 0)
 			//unifiedTransport.Write([]byte("testconsistent02"), "testconsistent02", "consistent02", 0)
-			unifiedTransport.Write([]byte(strconv.Itoa(index)), "", "123", 0)
+			unifiedTransport.Write([]byte(strconv.Itoa(index)), "", "", "123", 0)
 			index++
 			// Optional: Add logging to confirm messages are sent
 			fmt.Println("Messages sent at:", time.Now())
@@ -287,6 +289,98 @@ func TestSafeGo() {
 		panic("this is test")
 	})
 }
+
+func GenerateVolcRtmpUrl() {
+
+}
+
+func GenerateTxRtmpUrl() {
+	idleTime := time.Now().Unix() + 86400
+	config := tools.RtmpConfig{
+		AppID:       "",
+		StreamName:  "",
+		Domain:      "",
+		SecretKey:   "",
+		MaxIdleTime: idleTime, // 1小时
+		Format:      "",
+	}
+
+	rtmpURL := tools.GenerateTencentRtmpUrl(&config)
+	fmt.Println("Generated RTMP URL:", rtmpURL)
+}
+
+func NacosTest() {
+	// 初始化配置
+	nacosConfig := &liveNacos.NacosConfig{
+		ServerConfigs: []constant.ServerConfig{{
+			IpAddr: "",
+			Port:   8848,
+		}},
+		ClientConfig: &constant.ClientConfig{
+			Username:            "", // 新增用户名
+			Password:            "", // 新增密码
+			NamespaceId:         "",
+			TimeoutMs:           5000,
+			NotLoadCacheAtStart: true,
+			LogDir:              "/tmp/nacos/log",
+			CacheDir:            "/tmp/nacos/cache",
+		},
+	}
+
+	// 初始化配置中心
+	configCenter, err := liveNacos.NewConfigCenter(nacosConfig)
+	if err != nil {
+		log.Fatalf("Config center init failed: %v", err)
+	}
+
+	// 获取配置示例
+	if content, err := configCenter.GetConfig("live-file-animation-converter.yaml", "test"); err == nil {
+		log.Printf("Initial config: %s\n", content)
+	}
+
+	// 注册配置变更监听器
+	err = configCenter.AddListener("live-file-animation-converter.yaml", "test", func(dataId, group, content string) {
+		log.Printf("Config changed detected!\nNew configuration: %s", content)
+	})
+	if err != nil {
+		log.Fatalf("Failed to add config listener: %v", err)
+	}
+
+	// 保持程序运行
+	log.Println("Application started, waiting for config changes...")
+	select {}
+
+}
+
+func TosTest() {
+	tosInfo := cloudStorage.TosInfo{}
+	config := zap.NewProductionConfig()
+	config.Level = zap.NewAtomicLevelAt(zap.DebugLevel) // 设置日志级别为 Debug
+	logger, _ := config.Build()
+	defer logger.Sync()
+	var err error
+	instanceTos, err := cloudStorage.NewTosClient(&tosInfo, logger)
+	if err != nil {
+		logger.Error("Failed to create TosClient", zap.Error(err))
+	}
+
+	contentList, err := instanceTos.GetPrefixList("20000000112_20160000023063110093")
+	if err != nil {
+		logger.Error("Failed to get prefix list", zap.Error(err))
+	}
+
+	logger.Info("Content List", zap.Any("contentList", contentList))
+	for _, content := range contentList {
+		url, err := instanceTos.GetObjectDownloadUrl(content.Key)
+		if err != nil {
+			logger.Error("Failed to get object download URL", zap.Error(err))
+			continue
+		}
+		logger.Info("Download URL", zap.String("url", url))
+	}
+
+}
+
 func main() {
 	//test.CreateLiveApiTest()
 	//test.ListLiveApiTest()
@@ -294,15 +388,19 @@ func main() {
 	//Test()
 	//TestDingTalk()
 	//TestHttpMethod()
-	tools.InitLogger("./test.log", "info")
-	var wg sync.WaitGroup
-	wg.Add(1)
+	/*
+		tools.InitLogger("./test.log", "info")
+		var wg sync.WaitGroup
+		wg.Add(1)
 
-	ctx := context.Background()
-	tools.SafeGo(ctx, func(ctx context.Context) {
-		defer wg.Done()
-		panic("this is test")
-	})
+		ctx := context.Background()
+		tools.SafeGo(ctx, func(ctx context.Context) {
+			defer wg.Done()
+			panic("this is test")
+		})
 
-	wg.Wait()
+		wg.Wait()*/
+
+	//NacosTest()
+	TosTest()
 }

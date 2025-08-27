@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/volcengine/ve-tos-golang-sdk/v2/tos"
+	"github.com/volcengine/ve-tos-golang-sdk/v2/tos/enum"
 	"github.com/yangwoodstar/NovaCore/src/api"
 	"github.com/yangwoodstar/NovaCore/src/modelStruct"
 	"github.com/yangwoodstar/NovaCore/src/tools"
@@ -156,4 +157,33 @@ func (tosClient *TosClient) ResumeDownloadFile(filePath, objectKey string) error
 		tosClient.Logger.Info("DownloadFile Request ID:", zap.String("RequestID", output.RequestID))
 	}
 	return err
+}
+
+func (tosClient *TosClient) GetPrefixList(prefix string) ([]tos.ListedObjectV2, error) {
+	continuationToken := ""
+	output, err := tosClient.Client.ListObjectsType2(tosClient.TosContext, &tos.ListObjectsType2Input{
+		Bucket:            tosClient.TosInfo.Bucket,
+		MaxKeys:           1000,
+		ContinuationToken: continuationToken,
+		Prefix:            prefix,
+	})
+	if err != nil {
+		tosClient.Logger.Error("Error listing objects", zap.String("error", err.Error()))
+		return nil, err
+	}
+
+	return output.Contents, nil
+}
+
+func (tosClient *TosClient) GetObjectDownloadUrl(objectKey string) (string, error) {
+	url, err := tosClient.Client.PreSignedURL(&tos.PreSignedURLInput{
+		HTTPMethod: enum.HttpMethodGet,
+		Bucket:     tosClient.TosInfo.Bucket,
+		Key:        objectKey,
+	})
+	if err != nil {
+		tosClient.Logger.Error("Error generating pre-signed URL", zap.String("error", err.Error()))
+		return "", err
+	}
+	return url.SignedUrl, nil
 }

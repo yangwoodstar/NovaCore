@@ -41,16 +41,16 @@ func NewUnifiedTransport() *UnifiedTransport {
 	return transportInstance
 }
 
-func (u *UnifiedTransport) AddSender(topic string, t Transport) {
+func (u *UnifiedTransport) AddSender(appId, topic string, t Transport) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
-	u.senders[topic] = t
+	u.senders[appId+topic] = t
 }
 
-func (u *UnifiedTransport) AddReceiver(topic string, t Transport) {
+func (u *UnifiedTransport) AddReceiver(appId, topic string, t Transport) {
 	u.mu.Lock()
 	defer u.mu.Unlock()
-	u.receives[topic] = t
+	u.receives[appId+topic] = t
 	go func() {
 		for {
 			msg, readErr := t.Read()
@@ -73,8 +73,8 @@ func (u *UnifiedTransport) Read() (UnificationMessage, error) {
 }
 
 // Write 向传输层写入数据
-func (u *UnifiedTransport) Write(p []byte, topic, routerKey string, priority int) error {
-	transport, exist := u.senders[topic]
+func (u *UnifiedTransport) Write(p []byte, appID, topic, routerKey string, priority int) error {
+	transport, exist := u.senders[appID+topic]
 	if exist {
 		err := transport.Write(p, topic, routerKey, priority)
 		if err != nil {
