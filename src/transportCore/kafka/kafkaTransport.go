@@ -27,11 +27,8 @@ func GetKafkaProducer(brokers []string, partition int, logger *zap.Logger) (*Kaf
 	logger.Info("GetKafkaProducer", zap.Any("brokers", brokers), zap.Int("partition", partition))
 
 	config := sarama.NewConfig()
-	if partition != 0 {
-		config.Producer.Partitioner = func(topic string) sarama.Partitioner {
-			return NewCustomPartitioner(partition, logger)
-		}
-	}
+	config.Producer.Partitioner = sarama.NewHashPartitioner
+
 	// 对于异步生产者，不需要 Return.Successes
 	config.Producer.Retry.Max = 3
 	config.Producer.Retry.Backoff = 100 * time.Millisecond
@@ -135,10 +132,10 @@ func (kp *KafkaProducer) Write(message []byte, topic, routerKey string, priority
 
 	kp.logger.Debug("Publish message", zap.String("topic", topic), zap.String("parentRoomID", routerKey), zap.Int("priority", priority))
 	msg := &sarama.ProducerMessage{
-		Topic:     topic,
-		Key:       sarama.StringEncoder(routerKey),
-		Value:     sarama.ByteEncoder(message),
-		Partition: int32(priority),
+		Topic: topic,
+		Key:   sarama.StringEncoder(routerKey),
+		Value: sarama.ByteEncoder(message),
+		//Partition: int32(priority),
 	}
 
 	kp.wg.Add(1)
