@@ -11,6 +11,9 @@ type FileTranscode struct {
 	UserInfo         UserInfo `json:"userInfo"`
 	Cost             int64    `json:"cost"` // 处理时间
 	Biz              int      `json:"biz"`  // 业务类型
+	UUID             string   `json:"uuid"`
+	RandString       string   `json:"randString"`
+	FileKey          string   `json:"fileKey"`
 }
 
 type UserInfo struct {
