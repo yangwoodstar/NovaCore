@@ -3,6 +3,10 @@ package cloudStorage
 import (
 	"context"
 	"errors"
+	"github.com/yangwoodstar/NovaCore/src/constString"
+	"sort"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/volcengine/ve-tos-golang-sdk/v2/tos"
@@ -235,4 +239,85 @@ func (tosClient *TosClient) GetObjectDownloadUrl(objectKey string) (string, erro
 		return "", err
 	}
 	return url.SignedUrl, nil
+}
+
+func (tosClient *TosClient) ListObject(task *modelStruct.TranscodeInfo, envType string) ([]string, []string, error) {
+	prefix := constString.GetLiveStoragePath(task.AppID, task.RoomID, envType)
+	tosClient.Logger.Info("ListObject", zap.String("prefix", prefix))
+	continuationToken := ""
+	output, err := tosClient.Client.ListObjectsType2(tosClient.TosContext, &tos.ListObjectsType2Input{
+		Bucket:            tosClient.TosInfo.Bucket,
+		MaxKeys:           1000,
+		ContinuationToken: continuationToken,
+		Delimiter:         "/",
+		Prefix:            prefix,
+	})
+
+	if err != nil {
+		tosClient.Logger.Error("Error listing objects", zap.String("error", err.Error()))
+		return nil, nil, err
+	}
+
+	//signalFileName := util.GetSignalFileName(task.AppID, task.RoomID)
+	//tosClient.Logger.Info("signalFileName", zap.String("signalFileName", signalFileName))
+	var flvObjects []tos.ListedObjectV2
+	var signalInfoList []modelStruct.Signal
+	var signalAllPath string
+	for _, obj := range output.Contents {
+		if strings.HasSuffix(obj.Key, ".flv") || strings.HasSuffix(obj.Key, ".mp4") {
+			flvObjects = append(flvObjects, tos.ListedObjectV2{
+				Key:          obj.Key,
+				LastModified: obj.LastModified,
+			})
+		}
+		tosClient.Logger.Info("obj.Key", zap.String("obj.Key", obj.Key))
+		if strings.Contains(obj.Key, "part") {
+			keyRmSuffix := strings.TrimSuffix(obj.Key, ".part")
+			parts := strings.Split(keyRmSuffix, "_")
+			if len(parts) == 0 {
+				tosClient.Logger.Info("parts", zap.Any("obj.Key", obj.Key))
+				continue
+			}
+			ts := parts[len(parts)-1]
+			num, err := strconv.ParseInt(ts, 10, 64)
+			if err != nil {
+				tosClient.Logger.Error("Error converting", zap.String("error", err.Error()))
+				continue
+			}
+			signalInfo := modelStruct.Signal{
+				Name:      obj.Key,
+				TimeStamp: num,
+			}
+			signalInfoList = append(signalInfoList, signalInfo)
+			tosClient.Logger.Info("obj.Key", zap.String("obj.Key", obj.Key))
+		}
+
+		if strings.Contains(obj.Key, ".json") && !strings.Contains(obj.Key, "all.json") {
+			signalAllPath = obj.Key
+		}
+	}
+
+	// 根据最后修改时间对文件进行排序
+	sort.Slice(flvObjects, func(i, j int) bool {
+		return flvObjects[i].LastModified.Before(flvObjects[j].LastModified)
+	})
+
+	sort.Slice(signalInfoList, func(i, j int) bool {
+		return signalInfoList[i].TimeStamp < (signalInfoList[j].TimeStamp)
+	})
+
+	// 打印排序后的文件列表
+	var flvList = make([]string, 0)
+	for _, obj := range flvObjects {
+		flvList = append(flvList, obj.Key)
+	}
+	var signalPath = make([]string, 0)
+	for _, obj := range signalInfoList {
+		signalPath = append(signalPath, obj.Name)
+	}
+	if len(signalPath) == 0 {
+		signalPath = append(signalPath, signalAllPath)
+	}
+	tosClient.Logger.Info("flvList", zap.Any("flvList", flvList), zap.Any("signalPath", signalPath))
+	return flvList, signalPath, nil
 }
