@@ -3,6 +3,8 @@ package cloudStorage
 import (
 	"context"
 	"errors"
+	"sync"
+
 	"github.com/volcengine/ve-tos-golang-sdk/v2/tos"
 	"github.com/volcengine/ve-tos-golang-sdk/v2/tos/enum"
 	"github.com/yangwoodstar/NovaCore/src/api"
@@ -11,7 +13,13 @@ import (
 	"go.uber.org/zap"
 )
 
+type LiveTosClientManager struct {
+	AppIDTosClientMap map[string]*TosClient
+	mu                sync.RWMutex
+}
+
 type TosInfo struct {
+	AppID       string
 	EndPoint    string
 	AccessKey   string
 	SecretKey   string
@@ -22,6 +30,7 @@ type TosInfo struct {
 }
 
 type TosClient struct {
+	AppID      string
 	Client     *tos.ClientV2
 	TosContext context.Context
 	TosInfo    *TosInfo
@@ -29,11 +38,51 @@ type TosClient struct {
 }
 
 type PrivateInfo struct {
+	AppID     string
 	URL       string
 	AppCode   string
 	AccessKey string
 	SN        string
 	Private   bool
+}
+
+func (m *LiveTosClientManager) GetTosClient(appID string) (*TosClient, error) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+	if tosClient, ok := m.AppIDTosClientMap[appID]; ok {
+		return tosClient, nil
+	}
+	return nil, errors.New("not found")
+}
+
+func (m *LiveTosClientManager) AddTosClientWithPrivateInfo(info *PrivateInfo, logger *zap.Logger) (*TosClient, error) {
+	tosClient, err := NewPrivateTosClient(info, logger)
+	if err != nil {
+		return nil, err
+	}
+	m.AddTosClient(info.AppID, tosClient)
+	return tosClient, nil
+}
+
+func (m *LiveTosClientManager) AddTosClientWithConfig(config *TosInfo, logger *zap.Logger) (*TosClient, error) {
+	tosClient, err := NewTosClient(config, logger)
+	if err != nil {
+		return nil, err
+	}
+	m.AddTosClient(config.AppID, tosClient)
+	return tosClient, nil
+}
+
+func (m *LiveTosClientManager) AddTosClient(appID string, tosClient *TosClient) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.AppIDTosClientMap[appID] = tosClient
+}
+
+func (m *LiveTosClientManager) RemoveTosClient(appID string) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	delete(m.AppIDTosClientMap, appID)
 }
 
 func NewPrivateTosClient(info *PrivateInfo, logger *zap.Logger) (*TosClient, error) {
