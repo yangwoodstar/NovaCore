@@ -44,4 +44,5 @@ const (
 	RemoveActiveUser    = "removeActiveUser"
 	CustomData          = "customData"
 	QuestionStart       = "questionStart"
+	CustomBroadcast     = "customBroadcast"
 )
