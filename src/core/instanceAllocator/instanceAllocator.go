@@ -22,8 +22,21 @@ type ByteDanceConfig struct {
 }
 
 type AppIDMapConfig struct {
-	AppID  string `mapstructure:"appID"`
-	AppKey string `mapstructure:"appKey"`
+	AppID         string `mapstructure:"appID"`
+	AppKey        string `mapstructure:"appKey"`
+	Secret        string `mapstructure:"secret"`
+	PushDomain    string `mapstructure:"pushDomain"`
+	PullDomain    string `mapstructure:"pullDomain"`
+	PushSecret    string `mapstructure:"pushSecret"`
+	PullSecret    string `mapstructure:"pullSecret"`
+	PushDomainBak string `mapstructure:"pushDomainBak"`
+	PullDomainBak string `mapstructure:"pullDomainBak"`
+	PushSecretBak string `mapstructure:"pushSecretBak"`
+	PullSecretBak string `mapstructure:"pullSecretBak"`
+	Account       string `json:"account"`
+	Bucket        string `json:"bucket"`
+	AK            string `json:"ak"`
+	SK            string `json:"sk"`
 }
 
 // InstanceManager 管理多个字节跳动实例
