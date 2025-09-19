@@ -54,7 +54,7 @@ var (
 )
 
 // GetInstanceManager 获取实例管理器的单例
-func GetInstanceManager(appIDMap map[string]AppIDMapConfig, ak, sk, region string) *InstanceManager {
+func GetInstanceManager(appIDMap map[string]AppIDMapConfig, region string) *InstanceManager {
 	once.Do(func() {
 		defaultManager = &InstanceManager{
 			instances:       sync.Map{},
