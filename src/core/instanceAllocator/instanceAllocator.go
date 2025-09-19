@@ -44,8 +44,6 @@ type InstanceManager struct {
 	instances       sync.Map                  // key -> *ByteDanceInstance
 	appIDMap        map[string]AppIDMapConfig `mapstructure:"appIDMap"`
 	reverseAppIDMap map[string]string         // appID -> key
-	ak              string
-	sk              string
 	region          string
 	mu              sync.RWMutex
 }
@@ -61,8 +59,6 @@ func GetInstanceManager(appIDMap map[string]AppIDMapConfig, ak, sk, region strin
 		defaultManager = &InstanceManager{
 			instances:       sync.Map{},
 			appIDMap:        appIDMap,
-			ak:              ak,
-			sk:              sk,
 			region:          region,
 			reverseAppIDMap: make(map[string]string),
 		}
@@ -132,8 +128,8 @@ func (m *InstanceManager) getConfigForKey(appID string) (ByteDanceConfig, error)
 	}
 
 	return ByteDanceConfig{
-		AK:     m.ak,
-		SK:     m.sk,
+		AK:     appConfig.AK,
+		SK:     appConfig.SK,
 		AppID:  appConfig.AppID,
 		AppKey: appConfig.AppKey,
 		Region: m.region, // 可以根据需要从配置中获取
