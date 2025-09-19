@@ -22,17 +22,17 @@ type ByteDanceConfig struct {
 }
 
 type AppIDMapConfig struct {
-	AppID         string `mapstructure:"appID"`
-	AppKey        string `mapstructure:"appKey"`
-	Secret        string `mapstructure:"secret"`
-	PushDomain    string `mapstructure:"pushDomain"`
-	PullDomain    string `mapstructure:"pullDomain"`
-	PushSecret    string `mapstructure:"pushSecret"`
-	PullSecret    string `mapstructure:"pullSecret"`
-	PushDomainBak string `mapstructure:"pushDomainBak"`
-	PullDomainBak string `mapstructure:"pullDomainBak"`
-	PushSecretBak string `mapstructure:"pushSecretBak"`
-	PullSecretBak string `mapstructure:"pullSecretBak"`
+	AppID         string `json:"appID"`
+	AppKey        string `json:"appKey"`
+	Secret        string `json:"secret"`
+	PushDomain    string `json:"pushDomain"`
+	PullDomain    string `json:"pullDomain"`
+	PushSecret    string `json:"pushSecret"`
+	PullSecret    string `json:"pullSecret"`
+	PushDomainBak string `json:"pushDomainBak"`
+	PullDomainBak string `json:"pullDomainBak"`
+	PushSecretBak string `json:"pushSecretBak"`
+	PullSecretBak string `json:"pullSecretBak"`
 	Account       string `json:"account"`
 	Bucket        string `json:"bucket"`
 	AK            string `json:"ak"`
