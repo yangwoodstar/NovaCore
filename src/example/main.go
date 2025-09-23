@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
 	"github.com/yangwoodstar/NovaCore/src/api"
+	"github.com/yangwoodstar/NovaCore/src/cloud"
 	"github.com/yangwoodstar/NovaCore/src/cloudStorage"
 	"github.com/yangwoodstar/NovaCore/src/constString"
 	"github.com/yangwoodstar/NovaCore/src/core/instanceAllocator"
@@ -166,10 +167,10 @@ func TestAppID() {
 	}
 
 	// 初始化 InstanceManager
-	ak := "your_access_key"
-	sk := "your_secret_key"
+	//ak := "your_access_key"
+	//sk := "your_secret_key"
 	region := "your_region"
-	manager := instanceAllocator.GetInstanceManager(appIDMap, ak, sk, region)
+	manager := instanceAllocator.GetInstanceManager(appIDMap, region)
 
 	// 测试获取实例
 	key := "app1"
@@ -381,6 +382,120 @@ func TosTest() {
 
 }
 
+func TCRecordStart() {
+	tcClientManager := cloud.TCClientManager{
+		AppIDTCClientMap: make(map[uint64]*cloud.TCClient),
+	}
+
+	prefix := "origin"
+	tcClient := cloud.TCClient{
+		AppID:     0,
+		AppSecret: "",
+		SecretId:  "",
+		SecretKey: "",
+		Region:    "ap-guangzhou",
+		StorageConfig: &cloud.TCStorageConfig{
+			Vendor:    0,
+			Bucket:    "",
+			AccessKey: "",
+			SecretKey: "",
+			Region:    "",
+			FileNamePrefix: []*string{
+				&prefix,
+			},
+		},
+	}
+
+	err := tcClientManager.AddTCClient(&tcClient)
+	if err != nil {
+		fmt.Printf("Failed to add TCClient: %v\n", err)
+		return
+	}
+
+	tcStartRecordParams := cloud.TCStartRecordParams{
+		RoomID: "test_room_123",
+		UserID: "test_user_123",
+		RecordParams: &cloud.TCRecordParams{
+			RecordMode:           2,
+			MaxIdleTime:          300,
+			StreamType:           1,
+			OutputFormat:         3,
+			MaxMediaFileDuration: 360,
+			FillType:             1,
+			AudioSampleRate:      1,
+			AudioChannels:        2,
+			AudioBitrate:         64000,
+			MixLayoutMode:        1,
+			ResourceExpiredHour:  24,
+			RoomType:             0,
+		},
+	}
+
+	tcClientInstance, err := tcClientManager.GetTCClient()
+	if err != nil {
+		fmt.Printf("Failed to get TCClient: %v\n", err)
+		return
+	}
+
+	taskID, err := tcClientInstance.TCStartRecord(&tcStartRecordParams)
+	if err != nil {
+		fmt.Printf("Failed to start recording: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Recording started successfully, Task ID: %s\n", taskID.ToJsonString())
+
+}
+
+func TCRecordStop() {
+	tcClientManager := cloud.TCClientManager{
+		AppIDTCClientMap: make(map[uint64]*cloud.TCClient),
+	}
+
+	prefix := "origin"
+	tcClient := cloud.TCClient{
+		AppID:     0,
+		AppSecret: "",
+		SecretId:  "",
+		SecretKey: "",
+		Region:    "",
+		StorageConfig: &cloud.TCStorageConfig{
+			Vendor:    0,
+			Bucket:    "",
+			AccessKey: "",
+			SecretKey: "",
+			Region:    "",
+			FileNamePrefix: []*string{
+				&prefix,
+			},
+		},
+	}
+
+	err := tcClientManager.AddTCClient(&tcClient)
+	if err != nil {
+		fmt.Printf("Failed to add TCClient: %v\n", err)
+		return
+	}
+
+	tcClientInstance, err := tcClientManager.GetTCClient()
+	if err != nil {
+		fmt.Printf("Failed to get TCClient: %v\n", err)
+		return
+	}
+
+	tcStopRecordParams := cloud.TCStopRecordParams{
+		TaskID: "D0e3Ef9Rssb+R1es-YGCgDBq99csuHYfLtRXu7Fua9p+muIw9pP0FOpOYkgdMNK52kIoPlhHr3qeFesRtXnmqfAcSVUuOAA.",
+	}
+
+	response, err := tcClientInstance.TCStopRecord(&tcStopRecordParams)
+	if err != nil {
+		fmt.Printf("Failed to stop recording: %v\n", err)
+		return
+	}
+
+	fmt.Printf("Recording stopped successfully: %s\n", response.ToJsonString())
+}
+
 func main() {
 	//test.CreateLiveApiTest()
 	//test.ListLiveApiTest()
@@ -402,5 +517,8 @@ func main() {
 		wg.Wait()*/
 
 	//NacosTest()
-	TosTest()
+	//TosTest()
+
+	//TCRecordStart()
+	TCRecordStop()
 }

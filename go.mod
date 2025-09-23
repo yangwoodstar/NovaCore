@@ -10,6 +10,9 @@ require (
 	github.com/nacos-group/nacos-sdk-go/v2 v2.3.3
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/spaolacci/murmur3 v1.1.0
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common v1.1.31
+	github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/trtc v1.1.28
+	github.com/tencentyun/tls-sig-api-v2-golang v1.4.0
 	github.com/volcengine/ve-tos-golang-sdk/v2 v2.7.9
 	github.com/volcengine/volc-sdk-golang v1.0.196
 	go.uber.org/zap v1.27.0
