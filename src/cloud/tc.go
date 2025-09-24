@@ -29,6 +29,10 @@ type TCRecordParams struct {
 	MixLayoutMode        uint64
 	ResourceExpiredHour  uint64
 	RoomType             uint64
+	AudioSubscribeList   []*string
+	AudioUnSubscribeList []*string
+	VideoSubscribeList   []*string
+	VideoUnSubscribeList []*string
 }
 
 type TCStorageConfig struct {
@@ -112,13 +116,22 @@ func (t *TCClient) TCStartRecord(params *TCStartRecordParams) (*trtc.CreateCloud
 	createRequest.PrivateMapKey = &privateMapKey
 	createRequest.ResourceExpiredHour = &params.RecordParams.ResourceExpiredHour
 	createRequest.RoomIdType = &params.RecordParams.RoomType // 字符串房间号
+
+	subscribeStreamUsers := &trtc.SubscribeStreamUserIds{
+		SubscribeAudioUserIds:   params.RecordParams.AudioSubscribeList,
+		UnSubscribeAudioUserIds: params.RecordParams.AudioUnSubscribeList,
+		SubscribeVideoUserIds:   params.RecordParams.VideoSubscribeList,
+		UnSubscribeVideoUserIds: params.RecordParams.VideoUnSubscribeList,
+	}
+
 	createRequest.RecordParams = &trtc.RecordParams{
-		RecordMode:           &params.RecordParams.RecordMode,
-		MaxIdleTime:          &params.RecordParams.MaxIdleTime,
-		StreamType:           &params.RecordParams.StreamType,
-		OutputFormat:         &params.RecordParams.OutputFormat,
-		MaxMediaFileDuration: &params.RecordParams.MaxMediaFileDuration,
-		FillType:             &params.RecordParams.FillType,
+		RecordMode:             &params.RecordParams.RecordMode,
+		MaxIdleTime:            &params.RecordParams.MaxIdleTime,
+		StreamType:             &params.RecordParams.StreamType,
+		OutputFormat:           &params.RecordParams.OutputFormat,
+		MaxMediaFileDuration:   &params.RecordParams.MaxMediaFileDuration,
+		FillType:               &params.RecordParams.FillType,
+		SubscribeStreamUserIds: subscribeStreamUsers,
 	}
 
 	createRequest.StorageParams = &trtc.StorageParams{
