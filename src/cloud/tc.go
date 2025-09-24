@@ -29,6 +29,7 @@ type TCRecordParams struct {
 	MixLayoutMode        uint64
 	ResourceExpiredHour  uint64
 	RoomType             uint64
+	FileNamePrefix       []*string
 	AudioSubscribeList   []*string
 	AudioUnSubscribeList []*string
 	VideoSubscribeList   []*string
@@ -36,12 +37,11 @@ type TCRecordParams struct {
 }
 
 type TCStorageConfig struct {
-	Vendor         uint64
-	Bucket         string
-	AccessKey      string
-	SecretKey      string
-	Region         string
-	FileNamePrefix []*string
+	Vendor    uint64
+	Bucket    string
+	AccessKey string
+	SecretKey string
+	Region    string
 }
 
 type TCStartRecordParams struct {
@@ -141,7 +141,7 @@ func (t *TCClient) TCStartRecord(params *TCStartRecordParams) (*trtc.CreateCloud
 			Bucket:         &t.StorageConfig.Bucket,
 			AccessKey:      &t.StorageConfig.AccessKey,
 			SecretKey:      &t.StorageConfig.SecretKey,
-			FileNamePrefix: t.StorageConfig.FileNamePrefix,
+			FileNamePrefix: params.RecordParams.FileNamePrefix,
 		},
 	}
 
