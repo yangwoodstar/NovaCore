@@ -2,7 +2,6 @@ package cloud
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
@@ -81,7 +80,6 @@ func (m *TCClientManager) AddTCClient(tcClient *TCClient) error {
 	profile := profile2.NewClientProfile()
 	client, err := trtc.NewClient(credential, region, profile)
 	if err != nil {
-		fmt.Printf("创建TRTC客户端失败: %v\n", err)
 		return err
 	}
 	tcClient.Client = client
@@ -95,18 +93,16 @@ func (m *TCClientManager) RemoveTCClient(appID uint64) {
 	delete(m.AppIDTCClientMap, appID)
 }
 
-func (t *TCClient) TCStartRecord(params *TCStartRecordParams) (*trtc.CreateCloudRecordingResponse, error) {
+func (t *TCClient) TCStartRecord(params *TCStartRecordParams) (string, error) {
 	createRequest := trtc.NewCreateCloudRecordingRequest()
 	userSig, err := tencentyun.GenUserSig(int(t.AppID), t.AppSecret, params.UserID, 86400)
 	if err != nil {
-		fmt.Printf("GenUserSig error: %v", err)
-		return nil, err
+		return "", err
 	}
 
 	privateMapKey, err := tencentyun.GenPrivateMapKeyWithStringRoomID(int(t.AppID), t.AppSecret, params.UserID, 86400, params.RoomID, 63)
 	if err != nil {
-		fmt.Printf("GenPrivateMapKey error: %v", err)
-		return nil, err
+		return "", err
 	}
 
 	createRequest.SdkAppId = &t.AppID
@@ -162,22 +158,19 @@ func (t *TCClient) TCStartRecord(params *TCStartRecordParams) (*trtc.CreateCloud
 
 	response, err := t.Client.CreateCloudRecording(createRequest)
 	if err != nil {
-		fmt.Printf("CreateCloudRecording error: %v", err)
-		return nil, err
+		return "", err
 	}
-	fmt.Printf("CreateCloudRecording response: %v", response)
 
-	return response, nil
+	return *response.Response.TaskId, nil
 }
 
-func (t *TCClient) TCStopRecord(params *TCStopRecordParams) (*trtc.DeleteCloudRecordingResponse, error) {
+func (t *TCClient) TCStopRecord(params *TCStopRecordParams) (string, error) {
 	deleteRequest := trtc.NewDeleteCloudRecordingRequest()
 	deleteRequest.SdkAppId = &t.AppID
 	deleteRequest.TaskId = &params.TaskID
 	deleteResponse, deleteErr := t.Client.DeleteCloudRecording(deleteRequest)
 	if deleteErr != nil {
-		fmt.Printf("err: %v", deleteErr)
-		return nil, deleteErr
+		return "", deleteErr
 	}
-	return deleteResponse, nil
+	return *deleteResponse.Response.TaskId, nil
 }
