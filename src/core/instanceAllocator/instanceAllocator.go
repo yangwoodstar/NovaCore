@@ -21,22 +21,34 @@ type ByteDanceConfig struct {
 	Region string
 }
 
+type TCConfig struct {
+	AppID     uint64 `json:"appID"`
+	AppSecret string `json:"appSecret"`
+	SecretId  string `json:"secretId"`
+	SecretKey string `json:"secretKey"`
+	Bucket    string `json:"bucket"`
+	AK        string `json:"ak"`
+	SK        string `json:"sk"`
+	Region    string `json:"region"`
+}
+
 type AppIDMapConfig struct {
-	AppID         string `json:"appID"`
-	AppKey        string `json:"appKey"`
-	Secret        string `json:"secret"`
-	PushDomain    string `json:"pushDomain"`
-	PullDomain    string `json:"pullDomain"`
-	PushSecret    string `json:"pushSecret"`
-	PullSecret    string `json:"pullSecret"`
-	PushDomainBak string `json:"pushDomainBak"`
-	PullDomainBak string `json:"pullDomainBak"`
-	PushSecretBak string `json:"pushSecretBak"`
-	PullSecretBak string `json:"pullSecretBak"`
-	Account       string `json:"account"`
-	Bucket        string `json:"bucket"`
-	AK            string `json:"ak"`
-	SK            string `json:"sk"`
+	AppID         string   `json:"appID"`
+	AppKey        string   `json:"appKey"`
+	Secret        string   `json:"secret"`
+	PushDomain    string   `json:"pushDomain"`
+	PullDomain    string   `json:"pullDomain"`
+	PushSecret    string   `json:"pushSecret"`
+	PullSecret    string   `json:"pullSecret"`
+	PushDomainBak string   `json:"pushDomainBak"`
+	PullDomainBak string   `json:"pullDomainBak"`
+	PushSecretBak string   `json:"pushSecretBak"`
+	PullSecretBak string   `json:"pullSecretBak"`
+	Account       string   `json:"account"`
+	Bucket        string   `json:"bucket"`
+	AK            string   `json:"ak"`
+	SK            string   `json:"sk"`
+	TCConfig      TCConfig `json:"tcConfig"`
 }
 
 // InstanceManager 管理多个字节跳动实例
