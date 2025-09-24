@@ -383,6 +383,7 @@ func TosTest() {
 }
 
 func TCRecordStart() {
+	appID := uint64(0)
 	tcClientManager := cloud.TCClientManager{
 		AppIDTCClientMap: make(map[uint64]*cloud.TCClient),
 	}
@@ -431,7 +432,7 @@ func TCRecordStart() {
 		},
 	}
 
-	tcClientInstance, err := tcClientManager.GetTCClient()
+	tcClientInstance, err := tcClientManager.GetTCClient(appID)
 	if err != nil {
 		fmt.Printf("Failed to get TCClient: %v\n", err)
 		return
@@ -448,6 +449,7 @@ func TCRecordStart() {
 }
 
 func TCRecordStop() {
+	appID := uint64(0)
 	tcClientManager := cloud.TCClientManager{
 		AppIDTCClientMap: make(map[uint64]*cloud.TCClient),
 	}
@@ -477,7 +479,7 @@ func TCRecordStop() {
 		return
 	}
 
-	tcClientInstance, err := tcClientManager.GetTCClient()
+	tcClientInstance, err := tcClientManager.GetTCClient(appID)
 	if err != nil {
 		fmt.Printf("Failed to get TCClient: %v\n", err)
 		return
