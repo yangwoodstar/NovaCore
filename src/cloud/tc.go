@@ -53,6 +53,10 @@ type TCStopRecordParams struct {
 	TaskID string
 }
 
+type TCDescribeRecordParams struct {
+	TaskID string
+}
+
 type TCClient struct {
 	AppID         uint64
 	AppSecret     string
@@ -173,4 +177,11 @@ func (t *TCClient) TCStopRecord(params *TCStopRecordParams) (string, error) {
 		return "", deleteErr
 	}
 	return *deleteResponse.Response.TaskId, nil
+}
+
+func (t *TCClient) TCDescribeRecord(params *TCDescribeRecordParams) (*trtc.DescribeCloudRecordingResponse, error) {
+	describeRequest := trtc.NewDescribeCloudRecordingRequest()
+	describeRequest.SdkAppId = &t.AppID
+	describeRequest.TaskId = &params.TaskID
+	return t.Client.DescribeCloudRecording(describeRequest)
 }

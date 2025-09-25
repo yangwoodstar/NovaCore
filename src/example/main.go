@@ -388,7 +388,7 @@ func TCRecordStart() {
 		AppIDTCClientMap: make(map[uint64]*cloud.TCClient),
 	}
 
-	prefix := "origin"
+	//prefix := "origin"
 	tcClient := cloud.TCClient{
 		AppID:     0,
 		AppSecret: "",
@@ -401,9 +401,6 @@ func TCRecordStart() {
 			AccessKey: "",
 			SecretKey: "",
 			Region:    "",
-			FileNamePrefix: []*string{
-				&prefix,
-			},
 		},
 	}
 
@@ -444,7 +441,7 @@ func TCRecordStart() {
 		return
 	}
 
-	fmt.Printf("Recording started successfully, Task ID: %s\n", taskID.ToJsonString())
+	fmt.Printf("Recording started successfully, Task ID: %s\n", taskID)
 
 }
 
@@ -454,7 +451,7 @@ func TCRecordStop() {
 		AppIDTCClientMap: make(map[uint64]*cloud.TCClient),
 	}
 
-	prefix := "origin"
+	//prefix := "origin"
 	tcClient := cloud.TCClient{
 		AppID:     0,
 		AppSecret: "",
@@ -467,9 +464,6 @@ func TCRecordStop() {
 			AccessKey: "",
 			SecretKey: "",
 			Region:    "",
-			FileNamePrefix: []*string{
-				&prefix,
-			},
 		},
 	}
 
@@ -495,7 +489,7 @@ func TCRecordStop() {
 		return
 	}
 
-	fmt.Printf("Recording stopped successfully: %s\n", response.ToJsonString())
+	fmt.Printf("Recording stopped successfully: %s\n", response)
 }
 
 func main() {
