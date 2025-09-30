@@ -117,11 +117,21 @@ func (t *TCClient) TCStartRecord(params *TCStartRecordParams) (string, error) {
 	createRequest.ResourceExpiredHour = &params.RecordParams.ResourceExpiredHour
 	createRequest.RoomIdType = &params.RecordParams.RoomType // 字符串房间号
 
-	subscribeStreamUsers := &trtc.SubscribeStreamUserIds{
-		SubscribeAudioUserIds:   params.RecordParams.AudioSubscribeList,
-		UnSubscribeAudioUserIds: params.RecordParams.AudioUnSubscribeList,
-		SubscribeVideoUserIds:   params.RecordParams.VideoSubscribeList,
-		UnSubscribeVideoUserIds: params.RecordParams.VideoUnSubscribeList,
+	subscribeStreamUsers := &trtc.SubscribeStreamUserIds{}
+	if len(params.RecordParams.AudioSubscribeList) > 0 {
+		subscribeStreamUsers.SubscribeAudioUserIds = params.RecordParams.AudioSubscribeList
+	}
+
+	if len(params.RecordParams.VideoSubscribeList) > 0 {
+		subscribeStreamUsers.SubscribeVideoUserIds = params.RecordParams.VideoSubscribeList
+	}
+
+	if len(params.RecordParams.AudioUnSubscribeList) > 0 {
+		subscribeStreamUsers.UnSubscribeAudioUserIds = params.RecordParams.AudioUnSubscribeList
+	}
+
+	if len(params.RecordParams.VideoUnSubscribeList) > 0 {
+		subscribeStreamUsers.UnSubscribeVideoUserIds = params.RecordParams.VideoUnSubscribeList
 	}
 
 	createRequest.RecordParams = &trtc.RecordParams{
