@@ -19,7 +19,7 @@ type Payload struct {
 
 type EventInfo struct {
 	RoomId    string  `json:"RoomId"`
-	EventTs   string  `json:"EventTs"`
+	EventTs   int64   `json:"EventTs"`
 	EventMsTs int64   `json:"EventMsTs"`
 	UserId    string  `json:"UserId"`
 	TaskId    string  `json:"TaskId"`
