@@ -58,5 +58,5 @@ func GetTcRecordFilePath(config *RecordConfig) string {
 	if config.FileName != "" {
 		fileName = config.FileName
 	}
-	return fmt.Sprintf("/%s/%s/%s/%s/%s/%s/%s/%s/%s", "origin", config.FirstPrefix, config.SecondPrefix, config.EnvType, config.AppID, config.RoomID, config.TaskID, config.TcTaskID, fileName)
+	return fmt.Sprintf("%s/%s/%s/%s/%s/%s/%s/%s/%s", "origin", config.FirstPrefix, config.SecondPrefix, config.EnvType, config.AppID, config.RoomID, config.TaskID, config.TcTaskID, fileName)
 }
