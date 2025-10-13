@@ -16,6 +16,7 @@ type RecordConfig struct {
 	SecondPrefix string
 	EnvType      string
 	ObjFileName  string
+	fileName     string
 }
 
 func CleanString(origin string) string {
@@ -54,5 +55,8 @@ func GetTcRecordFilePath(config *RecordConfig) string {
 	}
 	withoutSuffix := strings.TrimSuffix(config.ObjFileName, ".m3u8")
 	fileName := fmt.Sprintf("%s.%s", withoutSuffix, fileType)
+	if config.fileName != "" {
+		fileName = config.fileName
+	}
 	return fmt.Sprintf("/%s/%s/%s/%s/%s/%s/%s/%s/%s", "origin", config.FirstPrefix, config.SecondPrefix, config.EnvType, config.AppID, config.RoomID, config.TaskID, config.TcTaskID, fileName)
 }
