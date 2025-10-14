@@ -32,3 +32,9 @@ type EventCallback struct {
 	CallbackTs   int64     `json:"CallbackTs"`
 	EventInfo    EventInfo `json:"EventInfo"`
 }
+
+type EventCallbackOrigin struct {
+	EventGroupId int   `json:"EventGroupId"`
+	EventType    int   `json:"EventType"`
+	CallbackTs   int64 `json:"CallbackTs"`
+}
