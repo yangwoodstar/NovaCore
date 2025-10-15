@@ -41,7 +41,7 @@ func GetRecordFilePath(config *RecordConfig) string {
 	appIDProcess := CleanString(config.AppID)
 	roomIDProcess := CleanString(config.RoomID)
 	fileName := fmt.Sprintf("%s_%s_%s.%s", config.AppID, config.RoomID, config.TaskID, fileType)
-	return fmt.Sprintf("/%s/%s/%s/%s/%s/%s", config.FirstPrefix, config.SecondPrefix, config.EnvType, appIDProcess, roomIDProcess, fileName)
+	return fmt.Sprintf("%s/%s/%s/%s/%s/%s", config.FirstPrefix, config.SecondPrefix, config.EnvType, appIDProcess, roomIDProcess, fileName)
 }
 
 func GetTcRecordFilePath(config *RecordConfig) string {
