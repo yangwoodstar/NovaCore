@@ -30,6 +30,7 @@ type TCConfig struct {
 	AK        string `json:"ak"`
 	SK        string `json:"sk"`
 	Region    string `json:"region"`
+	CosRegion string `json:"cosRegion"`
 }
 
 type AppIDMapConfig struct {
