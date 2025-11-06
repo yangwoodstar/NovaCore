@@ -13,10 +13,10 @@ type WorkerPool struct {
 	tasks      map[string]chan Task // 每个 hash 值对应一个任务通道
 	wg         sync.WaitGroup
 	consistent *ConsistentHash
-	handler    func(task Task) error
+	handler    func(task *Task) error
 }
 
-func NewWorkerPool(poolSize, queueSize int, taskName []string, handler func(task Task) error) *WorkerPool {
+func NewWorkerPool(poolSize, queueSize int, taskName []string, handler func(task *Task) error) *WorkerPool {
 	tasks := make(map[string]chan Task, poolSize)
 	for _, value := range taskName {
 		tasks[value] = make(chan Task, queueSize)
@@ -47,7 +47,7 @@ func (wp *WorkerPool) worker(workerID string) {
 	defer wp.wg.Done()
 	for task := range wp.tasks[workerID] {
 		//tools.Logger.Debug("task", zap.String("workerID", workerID), zap.String("task", string(task.Data)))
-		err := wp.handler(task)
+		err := wp.handler(&task)
 		if err != nil {
 			ackErr := task.Data.Ack()
 			if ackErr != nil {
