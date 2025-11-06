@@ -11,7 +11,10 @@ func SafeGo(ctx context.Context, handler func(context.Context)) {
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				Logger.Error("SafeGo Panic", zap.Any("error", r), zap.String("stack", string(debug.Stack())))
+				logger := GetLogger()
+				if logger != nil {
+					logger.Error("SafeGo Panic", zap.Any("error", r), zap.String("stack", string(debug.Stack())))
+				}
 			}
 		}()
 
@@ -24,7 +27,10 @@ func SafeGoWithParams(ctx context.Context, handler func(context.Context, ...inte
 	go func() {
 		defer func() {
 			if r := recover(); r != nil {
-				Logger.Error("SafeGoWithParams Panic", zap.Any("error", r), zap.String("stack", string(debug.Stack())))
+				logger := GetLogger()
+				if logger != nil {
+					logger.Error("SafeGoWithParams Panic", zap.Any("error", r), zap.String("stack", string(debug.Stack())))
+				}
 			}
 		}()
 

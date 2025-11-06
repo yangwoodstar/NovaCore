@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"encoding/base64"
 	"fmt"
 	"github.com/yangwoodstar/NovaCore/src/constString"
 	"strings"
@@ -59,4 +60,15 @@ func GetTcRecordFilePath(config *RecordConfig) string {
 		fileName = config.FileName
 	}
 	return fmt.Sprintf("%s/%s/%s/%s/%s/%s/%s/%s/%s", "origin", config.FirstPrefix, config.SecondPrefix, config.EnvType, config.AppID, config.RoomID, config.TaskID, config.TcTaskID, fileName)
+}
+
+func Base64EncodeAndReplace(roomNumber string) string {
+	// Base64编码
+	encoded := base64.StdEncoding.EncodeToString([]byte(roomNumber))
+
+	// 替换字符
+	encoded = strings.ReplaceAll(encoded, "/", "-")
+	encoded = strings.ReplaceAll(encoded, "=", ".")
+
+	return encoded
 }

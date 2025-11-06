@@ -1,16 +1,23 @@
 package tools
 
 import (
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"os"
-	"sync"
 )
 
 var (
-	Logger *zap.Logger
-	once   sync.Once
+	Logger         *zap.Logger
+	initOnce       sync.Once
+	mu             sync.RWMutex
+	defaultLogPath = "logs/app.log"
 )
 
 type LoggerConfig struct {
@@ -23,84 +30,178 @@ type LoggerConfig struct {
 	IsStdout   bool
 }
 
-func GetLogger() *zap.Logger {
-	return Logger
-}
-
-func InitLogger(config LoggerConfig) {
-	// 日志分割
-	once.Do(func() {
-		hook := lumberjack.Logger{
-			Filename:   config.LogPath,    // 日志文件路径，默认 os.TempDir()
-			MaxSize:    config.MaxSize,    // 每个日志文件保存10M，默认 100M
-			MaxBackups: config.MaxBackups, // 保留30个备份，默认不限
-			MaxAge:     config.MaxAge,     // 保留7天，默认不限
-			Compress:   config.Compress,   // 是否压缩，默认不压缩
-		}
-		fileWriteSyncer := zapcore.AddSync(&hook)
-		//consoleWriteSyncer := zapcore.AddSync(os.Stdout)
-		//multiWriteSyncer := zapcore.NewMultiWriteSyncer(fileWriteSyncer, consoleWriteSyncer)
-		// 设置日志级别
-		// debug 可以打印出 info debug warn
-		// info  级别可以打印 warn info
-		// warn  只能打印 warn
-		// debug->info->warn->error
-		var level zapcore.Level
-		switch config.LogLevel {
-		case "debug":
-			level = zap.DebugLevel
-		case "info":
-			level = zap.InfoLevel
-		case "error":
-			level = zap.ErrorLevel
-		default:
-			level = zap.InfoLevel
-		}
-		encoderConfig := zapcore.EncoderConfig{
-			TimeKey:        "time",
-			LevelKey:       "level",
-			NameKey:        "logger",
-			CallerKey:      "linenum",
-			MessageKey:     "msg",
-			StacktraceKey:  "stacktrace",
-			LineEnding:     zapcore.DefaultLineEnding,
-			EncodeLevel:    zapcore.LowercaseLevelEncoder,  // 小写编码器
-			EncodeTime:     zapcore.ISO8601TimeEncoder,     // ISO8601 UTC 时间格式
-			EncodeDuration: zapcore.SecondsDurationEncoder, //
-			EncodeCaller:   zapcore.FullCallerEncoder,      // 全路径编码器
-			EncodeName:     zapcore.FullNameEncoder,
-		}
-		// 设置日志级别
-		atomicLevel := zap.NewAtomicLevel()
-		atomicLevel.SetLevel(level)
-		writer := fileWriteSyncer
-		if config.IsStdout == true {
-			writer = zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(fileWriteSyncer))
-		}
-		core := zapcore.NewCore(
-			// zapcore.NewConsoleEncoder(encoderConfig),
-			zapcore.NewJSONEncoder(encoderConfig),
-			//zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), zapcore.AddSync(write)), // 打印到控制台和文件
-			//multiWriteSyncer,
-			writer,
-			level,
-		)
-		// 开启开发模式，堆栈跟踪
-		caller := zap.AddCaller()
-		// 开启文件及行号
-		development := zap.Development()
-		// 设置初始化字段,如：添加一个服务器名称
-		//filed := zap.Fields(zap.String("V5Live", "backend"))
-		// 构造日志
-		//Logger = zap.New(core, caller, development, filed)
-		Logger = zap.New(core, caller, development)
-		Logger.Info("Live backend Logger init success")
-	})
-}
-
-func WithTraceID(traceID string) *zap.Logger {
-	if traceID != "" {
-		return Logger.With(zap.String("trace_id", traceID))
+// parseLogLevel 解析日志级别字符串
+func parseLogLevel(levelStr string) zapcore.Level {
+	levelStr = strings.ToLower(strings.TrimSpace(levelStr))
+	switch levelStr {
+	case "debug":
+		return zap.DebugLevel
+	case "info":
+		return zap.InfoLevel
+	case "warn":
+		return zap.WarnLevel
+	case "error":
+		return zap.ErrorLevel
+	default:
+		return zap.InfoLevel
 	}
+}
+
+// validateConfig 验证并设置默认值
+func validateConfig(config *LoggerConfig) error {
+	if config.LogPath == "" {
+		return errors.New("LogPath cannot be empty")
+	}
+	if config.LogLevel == "" {
+		config.LogLevel = "info"
+	}
+	if config.MaxSize <= 0 {
+		config.MaxSize = 100
+	}
+	if config.MaxBackups < 0 {
+		config.MaxBackups = 10
+	}
+	if config.MaxAge <= 0 {
+		config.MaxAge = 7
+	}
+
+	logDir := filepath.Dir(config.LogPath)
+	if logDir != "." && logDir != "" {
+		if err := os.MkdirAll(logDir, 0755); err != nil {
+			return fmt.Errorf("failed to create log directory: %w", err)
+		}
+		// 检查可写性
+		testFile := filepath.Join(logDir, ".write_test")
+		if f, err := os.Create(testFile); err != nil {
+			return fmt.Errorf("log directory is not writable: %w", err)
+		} else {
+			f.Close()
+			os.Remove(testFile)
+		}
+	}
+	return nil
+}
+
+// buildLogger 构建 logger（公共函数）
+func buildLogger(config LoggerConfig) *zap.Logger {
+	hook := lumberjack.Logger{
+		Filename:   config.LogPath,
+		MaxSize:    config.MaxSize,
+		MaxBackups: config.MaxBackups,
+		MaxAge:     config.MaxAge,
+		Compress:   config.Compress,
+	}
+
+	fileSyncer := zapcore.AddSync(&hook)
+	level := parseLogLevel(config.LogLevel)
+
+	encoderConfig := zapcore.EncoderConfig{
+		TimeKey:        "time",
+		LevelKey:       "level",
+		NameKey:        "logger",
+		CallerKey:      "linenum",
+		MessageKey:     "msg",
+		StacktraceKey:  "stacktrace",
+		LineEnding:     zapcore.DefaultLineEnding,
+		EncodeLevel:    zapcore.LowercaseLevelEncoder,
+		EncodeTime:     zapcore.ISO8601TimeEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+		EncodeCaller:   zapcore.FullCallerEncoder,
+		EncodeName:     zapcore.FullNameEncoder,
+	}
+
+	writer := fileSyncer
+	if config.IsStdout {
+		writer = zapcore.NewMultiWriteSyncer(zapcore.AddSync(os.Stdout), fileSyncer)
+	}
+
+	core := zapcore.NewCore(zapcore.NewJSONEncoder(encoderConfig), writer, level)
+	return zap.New(core, zap.AddCaller(), zap.Development())
+}
+
+// initDefaultLogger 使用默认配置初始化
+func initDefaultLogger() {
+	config := LoggerConfig{
+		LogPath:    defaultLogPath,
+		LogLevel:   "info",
+		MaxSize:    100,
+		MaxBackups: 10,
+		MaxAge:     7,
+		Compress:   false,
+		IsStdout:   true,
+	}
+	_ = validateConfig(&config) // 忽略错误，使用默认值
+
+	mu.Lock()
+	Logger = buildLogger(config)
+	mu.Unlock()
+
+	if Logger != nil {
+		Logger.Info("Logger auto-initialized", zap.String("log_level", config.LogLevel))
+	}
+}
+
+// GetLogger 获取 Logger，未初始化则自动初始化
+func GetLogger() *zap.Logger {
+	mu.RLock()
+	if Logger != nil {
+		mu.RUnlock()
+		return Logger
+	}
+	mu.RUnlock()
+
+	initOnce.Do(initDefaultLogger)
 	return Logger
+}
+
+// MustGetLogger 获取 Logger，未初始化则自动初始化
+func MustGetLogger() *zap.Logger {
+	return GetLogger()
+}
+
+// InitLogger 初始化日志器
+func InitLogger(config LoggerConfig) error {
+	mu.RLock()
+	if Logger != nil {
+		mu.RUnlock()
+		return errors.New("logger has already been initialized")
+	}
+	mu.RUnlock()
+
+	var initErr error
+	initOnce.Do(func() {
+		if err := validateConfig(&config); err != nil {
+			initErr = err
+			return
+		}
+
+		mu.Lock()
+		Logger = buildLogger(config)
+		mu.Unlock()
+
+		if Logger != nil {
+			Logger.Info("Logger initialized",
+				zap.String("log_path", config.LogPath),
+				zap.String("log_level", config.LogLevel),
+			)
+		}
+	})
+	return initErr
+}
+
+// WithTraceID 返回带 trace_id 的 Logger
+func WithTraceID(traceID string) *zap.Logger {
+	logger := GetLogger()
+	if traceID != "" {
+		return logger.With(zap.String("trace_id", traceID))
+	}
+	return logger
+}
+
+// Sync 同步日志缓冲区
+func Sync() error {
+	if logger := GetLogger(); logger != nil {
+		return logger.Sync()
+	}
+	return nil
 }
