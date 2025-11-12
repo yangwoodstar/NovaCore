@@ -51,14 +51,14 @@ func (wp *WorkerPool) worker(workerID string) {
 		if err != nil {
 			ackErr := task.Data.Ack()
 			if ackErr != nil {
-				tools.Logger.Error("ack error", zap.Error(ackErr), zap.String("msg", string(task.Data.GetBody())))
+				tools.Logger.Error("ack error", zap.Error(ackErr), zap.Any("msg", task))
 			}
-			tools.Logger.Error("Failed to process record message", zap.Error(err))
+			tools.Logger.Error("Failed to process record message", zap.Error(err), zap.Any("msg", task))
 			continue
 		}
 		ackErr := task.Data.Ack()
 		if ackErr != nil {
-			tools.Logger.Error("ack error", zap.Error(ackErr), zap.String("msg", string(task.Data.GetBody())))
+			tools.Logger.Error("ack error", zap.Error(ackErr), zap.Any("msg", task))
 		}
 	}
 }

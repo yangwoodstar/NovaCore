@@ -28,10 +28,11 @@ const (
 	RoomInfo     = "/api/record/info"
 	RoomList     = "/api/record/list"
 
-	AiSnapShotStart  = "/api/ai/snapshot/start"
-	AiSnapShotStop   = "/api/ai/snapshot/stop"
-	AiSnapShotUpdate = "/api/ai/snapshot/update"
-	AiEnglishPath    = "/ai/detection/face"
+	AiSnapShotStart   = "/api/ai/snapshot/start"
+	AiSnapShotStop    = "/api/ai/snapshot/stop"
+	AiSnapShotUpdate  = "/api/ai/snapshot/update"
+	AiEnglishPath     = "/ai/detection/face"
+	AiMathRecordQuery = "/api/ai/math/record/query"
 )
 
 const (
