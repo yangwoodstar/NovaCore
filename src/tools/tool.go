@@ -4,7 +4,10 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/yangwoodstar/NovaCore/src/constString"
+	aimath "github.com/yangwoodstar/NovaCore/src/modelStruct/aiMath"
+	"go.uber.org/zap"
 	"strings"
+	"time"
 )
 
 type RecordConfig struct {
@@ -71,4 +74,25 @@ func Base64EncodeAndReplace(roomNumber string) string {
 	encoded = strings.ReplaceAll(encoded, "=", ".")
 
 	return encoded
+}
+
+// Retry 封装重试逻辑
+func RetryString(attempts int, sleep time.Duration, fn func() (interface{}, error)) (interface{}, error) {
+	var err error
+	var res interface{}
+	response := aimath.Response{}
+	for i := 0; i < attempts; i++ {
+		res, err = fn()
+		if err == nil {
+			GetLogger().Info("Retry", zap.Any("res", res))
+			GetLogger().Info("Retry", zap.Any("response", response.Result))
+			return res, nil
+		} else {
+			GetLogger().Error("Retry", zap.Error(err))
+		}
+		if i < 3 {
+			time.Sleep(1 * time.Second)
+		}
+	}
+	return res, err
 }
