@@ -47,6 +47,7 @@ func GetTCClientManager() *TCClientManager {
 				StorageConfig: &storageConfig,
 			}
 
+			tools.GetLogger().Info("add tc client", zap.Any("tcClient", tcClient))
 			err := tcClientManager.AddTCClient(&tcClient)
 			if err != nil {
 				tools.GetLogger().Error("GetTCClientManager add TCClient", zap.String("error", err.Error()), zap.Uint64("appID", appID), zap.String("appIDStr", appIDStr))
