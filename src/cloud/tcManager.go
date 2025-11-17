@@ -14,10 +14,12 @@ import (
 
 var tcClientManager *TCClientManager
 var once sync.Once
-var TcConfigMap map[string]instanceAllocator.AppIDMapConfig
+var TcConfigMap = make(map[string]instanceAllocator.AppIDMapConfig)
 
 func InitTCClientManager(tcConfigMap map[string]instanceAllocator.AppIDMapConfig) {
-	TcConfigMap = tcConfigMap
+	for appIDStr, tcConfig := range tcConfigMap {
+		TcConfigMap[appIDStr] = tcConfig
+	}
 }
 
 func GetTCClientManager() *TCClientManager {
