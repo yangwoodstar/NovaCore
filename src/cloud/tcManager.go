@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"sync"
+	"time"
 
 	v20190722 "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/trtc/v20190722"
 	"github.com/yangwoodstar/NovaCore/src/constString"
@@ -63,7 +64,7 @@ func GetTCClient(appID uint64) (*TCClient, error) {
 	return tcClientManager.GetTCClient(appID)
 }
 
-func DoStartRecord(prefix, appID, roomID, taskID string, subscribeList, unSubscribeList []*string) (string, error) {
+func DoStartRecord(prefix, appID, roomID, taskID string, subscribeList, unSubscribeList []*string, attempts int, timeSleep time.Duration) (string, error) {
 	tcConfig, ok := TcConfigMap[appID]
 	if !ok {
 		tools.GetLogger().Error("DoStartRecord", zap.String("error", "not found appID"), zap.String("appID", appID), zap.String("roomID", roomID), zap.String("taskID", taskID))
@@ -106,7 +107,7 @@ func DoStartRecord(prefix, appID, roomID, taskID string, subscribeList, unSubscr
 	if err != nil {
 		return "", err
 	}
-	retry, err := tools.RetryString(3, 1, func() (interface{}, error) {
+	retry, err := tools.RetryString(attempts, timeSleep, func() (interface{}, error) {
 		return instance.TCStartRecord(params)
 	})
 	if err != nil {
@@ -116,7 +117,7 @@ func DoStartRecord(prefix, appID, roomID, taskID string, subscribeList, unSubscr
 	return retry.(string), nil
 }
 
-func DoStopRecord(appID, tcTaskID string) (map[string]string, string, error) {
+func DoStopRecord(appID, tcTaskID string, attempts int, timeSleep time.Duration) (map[string]string, string, error) {
 	tcConfig, ok := TcConfigMap[appID]
 	if !ok {
 		return nil, "", errors.New(fmt.Sprintf("not found appID %s %s ", appID, tcTaskID))
@@ -130,7 +131,7 @@ func DoStopRecord(appID, tcTaskID string) (map[string]string, string, error) {
 	params := &TCStopRecordParams{
 		TaskID: tcTaskID,
 	}
-	retry, err := tools.RetryString(3, 1, func() (interface{}, error) {
+	retry, err := tools.RetryString(attempts, timeSleep, func() (interface{}, error) {
 		return instance.TCStopRecord(params)
 	})
 	if err != nil {
@@ -141,7 +142,7 @@ func DoStopRecord(appID, tcTaskID string) (map[string]string, string, error) {
 	return nil, tcTaskID, nil
 }
 
-func DoDescribeRecord(appID, roomID, taskID string) (*v20190722.DescribeCloudRecordingResponse, error) {
+func DoDescribeRecord(appID, roomID, taskID string, attempts int, timeSleep time.Duration) (*v20190722.DescribeCloudRecordingResponse, error) {
 	tcConfig, ok := TcConfigMap[appID]
 	if !ok {
 		tools.GetLogger().Error("DoDescribeRecord", zap.String("error", "not found appID"), zap.String("appID", appID), zap.String("roomID", roomID), zap.String("taskID", taskID))
@@ -156,7 +157,7 @@ func DoDescribeRecord(appID, roomID, taskID string) (*v20190722.DescribeCloudRec
 	params := &TCDescribeRecordParams{
 		TaskID: taskID,
 	}
-	retry, err := tools.RetryString(3, 1, func() (interface{}, error) {
+	retry, err := tools.RetryString(attempts, timeSleep, func() (interface{}, error) {
 		return instance.TCDescribeRecord(params)
 	})
 	if err != nil {
