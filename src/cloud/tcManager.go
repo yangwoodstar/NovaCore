@@ -157,6 +157,7 @@ func DoDescribeRecord(appID, roomID, taskID string, attempts int, timeSleep time
 	params := &TCDescribeRecordParams{
 		TaskID: taskID,
 	}
+	tools.GetLogger().Info("DoDescribeRecord params", zap.Any("params", params))
 	retry, err := tools.RetryString(attempts, timeSleep, func() (interface{}, error) {
 		return instance.TCDescribeRecord(params)
 	})
