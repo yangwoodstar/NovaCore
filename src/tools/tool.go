@@ -56,6 +56,8 @@ func GetTcRecordFilePath(config *RecordConfig) string {
 		fileType = constString.MP3Suffix
 	} else if config.RecordType == constString.VideoType {
 		fileType = constString.MP4Suffix
+	} else if config.RecordType == constString.AacType {
+		fileType = constString.AACSuffix
 	}
 	withoutSuffix := strings.TrimSuffix(config.ObjFileName, ".m3u8")
 	fileName := fmt.Sprintf("%s.%s", withoutSuffix, fileType)
@@ -91,7 +93,7 @@ func RetryString(attempts int, sleep time.Duration, fn func() (interface{}, erro
 			GetLogger().Error("Retry", zap.Error(err))
 		}
 		if i < 3 {
-			time.Sleep(1 * time.Second)
+			time.Sleep(sleep * time.Second)
 		}
 	}
 	return res, err

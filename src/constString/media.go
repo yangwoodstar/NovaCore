@@ -14,6 +14,7 @@ const (
 	AudioType   = 1
 	VideoType   = 2
 	WebcastType = 3
+	AacType     = 4
 )
 
 const (
