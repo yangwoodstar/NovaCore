@@ -201,8 +201,12 @@ func (rt *TransportRabbitMQ) bindQueue(configInfo *ConfigRabbitMQInfo, channel *
 		}
 	}
 
-	args = amqp.Table{
-		"x-max-length": 350000,
+	if args == nil {
+		args = amqp.Table{
+			"x-max-length": 350000,
+		}
+	} else {
+		args["x-max-length"] = 350000
 	}
 
 	if _, err := channel.QueueDeclare(configInfo.Queue, configInfo.QueueDurable, configInfo.QueueAutoDelete, false, false, args); err != nil {
