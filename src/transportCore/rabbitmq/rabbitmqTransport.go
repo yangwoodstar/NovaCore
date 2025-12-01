@@ -201,6 +201,10 @@ func (rt *TransportRabbitMQ) bindQueue(configInfo *ConfigRabbitMQInfo, channel *
 		}
 	}
 
+	args = amqp.Table{
+		"x-max-length": 350000,
+	}
+
 	if _, err := channel.QueueDeclare(configInfo.Queue, configInfo.QueueDurable, configInfo.QueueAutoDelete, false, false, args); err != nil {
 		rt.logger.Error("Queue Declare error", zap.Error(err), zap.Any("configInfo", configInfo))
 		return fmt.Errorf("error in declaring the queue: %w", err)
